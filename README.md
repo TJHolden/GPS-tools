@@ -1,4 +1,4 @@
-# GPS Tools
+# Guidant Tools
 
 Live: https://tjholden.github.io/GPS-tools/
 
