@@ -219,13 +219,56 @@
     .tag{font-size:6.5pt;padding:0 3pt}
   }
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap">
+<style id="guidant-theme">
+  /* Guidant Tools look: navy header card, gold primary actions, Public Sans. Appearance only; layout and behavior unchanged. */
+  :root{
+    --paper:#eef1f6; --surface:#ffffff; --ink:#14223b; --muted:#5a6579; --faint:#8b95a6;
+    --rule:#dbe1ea; --rule-strong:#bcc6d4; --accent:#1e3d6b; --accent-soft:#e6edf6;
+    --navy:#13294b; --navy-2:#1e3d6b; --on-navy:#f3f6fb; --on-navy-muted:#b6c4da; --gold:#c99a3b; --gold-hover:#b78a30;
+  }
+  body{font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap>header{position:relative;overflow:hidden;color:var(--on-navy);border:none;border-radius:14px;
+    background:radial-gradient(120% 160% at 90% 0%,var(--navy-2) 0%,var(--navy) 65%);
+    padding-top:24px;padding-left:26px;padding-bottom:22px;margin-bottom:24px;box-shadow:0 14px 30px -22px rgba(10,25,50,.6)}
+  .wrap>header::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+    background-size:28px 28px;mask-image:linear-gradient(90deg,transparent 30%,#000 85%)}
+  .wrap>header>div{position:relative;z-index:1}
+  .wrap>header .back{display:inline-block;font-size:12.5px;font-weight:600;color:var(--on-navy-muted);text-decoration:none;margin-bottom:8px}
+  .wrap>header .back:hover{color:var(--gold)}
+  .wrap>header h1{font-size:26px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .wrap>header h1 .mk{width:36px;height:36px;flex:none}
+  .wrap>header h1 .ver{color:var(--gold);font-weight:700;background:rgba(201,154,59,.14);padding:2px 8px;border-radius:999px;margin-left:0;vertical-align:0}
+  .wrap>header .sub{color:var(--on-navy-muted);font-size:14px;margin-top:6px;max-width:70ch}
+  @media (max-width:900px){ .wrap>header{padding-top:24px} body.hasfile .wrap>header{margin-top:52px} }
+  button.primary{background:var(--gold);border-color:var(--gold);color:#1b1404;font-weight:600}
+  button.primary:hover{background:var(--gold-hover);border-color:var(--gold-hover)}
+  button,select,input[type=text],input[type=number]{border-radius:8px}
+  .panel{border-radius:12px;box-shadow:0 1px 2px rgba(10,25,50,.04)}
+  .rim{border-radius:12px;overflow:hidden}
+  .rim>header{background:var(--accent-soft)}
+  .drop{border-radius:14px;background:var(--surface)}
+  .drop p.droplabel{color:var(--gold)}
+  .chip{border-radius:999px}
+  .chip[aria-selected=true]{background:var(--navy-2);border-color:var(--navy-2)}
+  .resume{border-radius:12px;border-color:#c8d5e6}
+  .resume .rlabel{color:var(--gold)}
+  #jump{border-radius:12px;border-color:var(--rule);box-shadow:0 10px 26px -14px rgba(10,25,50,.45)}
+  #jump nav button:hover{background:var(--navy-2);border-color:var(--navy-2)}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  .note.info{background:var(--accent-soft);color:var(--navy-2)}
+  .wrap>header .note.info{background:rgba(255,255,255,.1);color:var(--on-navy)}
+  @media print{ #topline th{text-transform:none;letter-spacing:0} }
+</style>
 </head>
 <body>
 <div class="wrap">
 
 <header>
   <div>
-    <h1>Rim Weighting <span class="ver" title="Version 1.2">v1.2</span></h1>
+    <a class="back" href="../">← All tools</a>
+    <h1><svg class="mk" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="rgba(255,255,255,.12)"/><rect x="7" y="17" width="4.5" height="9" rx="1" fill="#fff"/><rect x="13.75" y="10" width="4.5" height="16" rx="1" fill="#fff"/><rect x="20.5" y="13.5" width="4.5" height="12.5" rx="1" fill="#c99a3b"/></svg>Rim Weighting <span class="ver" title="Version 1.2">v1.2</span></h1>
     <p class="sub">Reads an SPSS .sav file in this browser, builds rake schemes, and writes SPSSINC RAKE syntax. Your data never leaves this computer.</p>
     <div id="projbar" class="hide">
       <button class="primary" id="newproj"><span aria-hidden="true">+</span> New Project/Saved Projects</button>
