@@ -305,11 +305,30 @@ async function getCPS(year,st){
   return {turnout,maleCit,maleVoters,n,nv,overall:tc?tv/tc:0};
 }
 
+// Newest releases are detected at load: any CPS November file or ACS 5-year release newer than the
+// last known one is picked up automatically once the Census Bureau publishes it.
+const KNOWN_CPS=[2024,2022], KNOWN_ACS=2024, THIS_YEAR=new Date().getFullYear();
+let acsYear=null;
+function acsCandidates(){
+  if(acsYear)return [acsYear];
+  const out=[];for(let y=THIS_YEAR;y>KNOWN_ACS;y--)out.push(String(y));
+  return [...out,String(KNOWN_ACS),String(KNOWN_ACS-1)];
+}
+async function probe(url){
+  try{const r=await fetch(url);if(!r.ok)return false;const j=await r.json();return Array.isArray(j)&&j.length>1}catch(e){return false}
+}
+async function detectElections(){
+  const extra=[];for(let y=THIS_YEAR;y>KNOWN_CPS[0];y--)if(y%2===0)extra.push(y);
+  const found=await Promise.all(extra.map(y=>probe(`https://api.census.gov/data/${y}/cps/voting/nov?get=PES1&for=state:11&key=${KEY}`).then(ok=>ok?y:null)));
+  const years=[...found.filter(Boolean),...KNOWN_CPS];
+  const sel=$("elec"), want=load("edu.elec");
+  sel.innerHTML=years.map(y=>`<option value="${y}">${y} ${y%4===0?"presidential":"midterm"}</option>`).join("");
+  sel.value=years.map(String).includes(want)?want:String(years[0]);
+}
 function initForm(){
   $("state").innerHTML=STATES.map(([f,n])=>`<option value="${f}">${n}</option>`).join("");
   $("state").value=load("edu.state")||"26";
   $("geo").value=load("edu.geo2")||"cd";
-  $("elec").value=load("edu.elec")||"2024";
   pop=load("edu.pop")||"voters"; if(!POP[pop])pop="voters";
   syncPop();
 }
@@ -321,7 +340,7 @@ function syncPop(){
 
 async function run(e){
   e&&e.preventDefault();
-  const st=$("state").value, geo=$("geo").value, elec=$("elec").value; let year="2024";
+  const st=$("state").value, geo=$("geo").value, elec=$("elec").value; let year;
   store("edu.state",st);store("edu.geo2",geo);store("edu.elec",elec);store("edu.pop",pop);
   const stName=STATES.find(s=>s[0]===st)[1];
   setStatus(`Loading ${stName}…`);$("go").disabled=true;
@@ -331,8 +350,12 @@ async function run(e){
     else{vars=B29;cps=await getCPS(pop==="voters"?elec:"2024",st); make=v=>fromB29(v,cps,pop)}
     const get="NAME,"+vars.join(",");
     const fetchACS=y=>Promise.all([getJSON(`${y}/acs/acs5`,{get,for:"state:"+st}),getJSON(`${y}/acs/acs5`,{get,for:GEO[geo].forv,in:"state:"+st})]);
-    let sJ,uJ;
-    try{[sJ,uJ]=await fetchACS(year)}catch(err){if(err instanceof TypeError)throw err;year="2023";[sJ,uJ]=await fetchACS(year)}
+    let sJ,uJ,lastErr;
+    for(const y of acsCandidates()){
+      try{[sJ,uJ]=await fetchACS(y);year=y;acsYear=y;break}
+      catch(err){if(err instanceof TypeError)throw err;lastErr=err}
+    }
+    if(!sJ)throw lastErr;
     const sr=rows(sJ,vars)[0]; stateRow={...sr,t:make(sr.vals)};
     units=rows(uJ,vars).map(u=>{const t=make(u.vals);return {...u,t,r:rollup(t)}}).filter(u=>u.t.total>0);
     selected.clear(); meta={stName,geo,year,elec,pop}; cpsInfo=cps;
@@ -428,7 +451,7 @@ $("copyAll").addEventListener("click",e=>{
   units.forEach(u=>{const r=u.r;L.push([u.name,pct(r.hsLess),pct(r.scA),pct(r.bach),pct(r.grad),pct(r.ltColl),pct(r.coll),pct(r.mLt),pct(r.mGe),pct(r.fLt),pct(r.fGe)])});
   copy(L.map(x=>x.join("\t")).join("\n"),e.target)});
 
-initForm(); run();
+initForm(); detectElections().then(()=>run());
 </script>
 </body>
 </html>
