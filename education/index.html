@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Education by Geography</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Cpath d=%27M32 10 2 24l30 14 30-14z%27 fill=%27%2316233a%27/%3E%3Cpath d=%27M14 31v13c0 5 8 9 18 9s18-4 18-9V31L32 39z%27 fill=%27%2316233a%27/%3E%3Cpath d=%27M56 27v16%27 stroke=%27%23b9852f%27 stroke-width=%273%27/%3E%3Ccircle cx=%2756%27 cy=%2746%27 r=%274%27 fill=%27%23b9852f%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: navy masthead band holding the title, population switch and controls; below it a sticky summary card beside the unit table.
+   Education groups use a four-step ramp (light = less schooling, deep = more) so every view reads the same way. */
+:root{
+  --bg:#eef1f6; --panel:#ffffff; --ink:#14223b; --muted:#5a6579; --line:#dbe1ea; --soft:#f5f7fb;
+  --navy:#13294b; --navy-2:#1e3d6b; --on-navy:#f3f6fb; --on-navy-muted:#b6c4da;
+  --gold:#c99a3b; --gold-soft:#f6ecd8; --warn:#a2471f;
+  --e1:#c9d8ec; --e2:#7fa3cf; --e3:#3c6aa3; --e4:#1b3a66;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c1320; --panel:#141e2f; --ink:#e7ecf4; --muted:#9aa7bb; --line:#26334a; --soft:#18243a;
+  --navy:#0f2140; --navy-2:#173159; --on-navy:#eef3fa; --on-navy-muted:#a7b6cd;
+  --gold:#ddb35e; --gold-soft:#3a2f18; --warn:#e48b62;
+  --e1:#2b4568; --e2:#47709f; --e3:#79a3d3; --e4:#bcd3ef; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1320; --panel:#141e2f; --ink:#e7ecf4; --muted:#9aa7bb; --line:#26334a; --soft:#18243a;
+  --navy:#0f2140; --navy-2:#173159; --on-navy:#eef3fa; --on-navy-muted:#a7b6cd;
+  --gold:#ddb35e; --gold-soft:#3a2f18; --warn:#e48b62;
+  --e1:#2b4568; --e2:#47709f; --e3:#79a3d3; --e4:#bcd3ef; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body)}
+.pad{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.inner{max-width:1480px;margin:0 auto}
+.mast{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);color:var(--on-navy);padding-block:28px 72px;position:relative;overflow:hidden}
+.mast::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:28px 28px;mask-image:linear-gradient(90deg,transparent,#000 70%)}
+.mast .inner{position:relative;z-index:1;display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand svg{flex:none;width:44px;height:44px}
+.brand h1{font-size:28px;font-weight:700;margin:0;letter-spacing:-.015em;text-wrap:balance}
+.back{display:inline-block;font-size:12.5px;font-weight:600;color:var(--on-navy-muted);text-decoration:none;margin-bottom:2px}
+.back:hover{color:var(--gold)}
+.brand p{margin:2px 0 0;color:var(--on-navy-muted);font-size:14px}
+.popbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.seg{display:inline-flex;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:4px;background:rgba(255,255,255,.06);gap:2px;flex-wrap:wrap}
+.seg button{background:transparent;border:0;color:var(--on-navy-muted);padding:8px 16px;border-radius:999px;font-weight:600}
+.seg button:hover{color:var(--on-navy)}
+.seg button[aria-pressed="true"]{background:var(--gold);color:#1b1404}
+.popbar .hint{font-size:13.5px;color:var(--on-navy-muted);max-width:62ch}
+.lift{margin-top:-52px;position:relative;z-index:2;padding-bottom:48px}
+.lift .inner{display:flex;flex-direction:column;gap:16px}
+.controls{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:0 10px 30px -18px rgba(10,25,50,.45)}
+label{display:flex;flex-direction:column;gap:5px;font-size:11.5px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+select,input{font:15px var(--f-body);color:var(--ink);background:var(--soft);border:1px solid var(--line);
+  border-radius:8px;padding:8px 10px;min-width:0}
+button{font:600 14px var(--f-body);border-radius:8px;padding:9px 16px;cursor:pointer;
+  border:1px solid var(--navy-2);background:var(--navy-2);color:#fff}
+#go{background:var(--gold);border-color:var(--gold);color:#1b1404;padding-inline:22px}
+button.ghost{background:transparent;color:var(--e3);border-color:var(--line)}
+button.ghost:hover:not(:disabled){border-color:var(--e3)}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.status{font-size:13px;color:var(--muted);min-height:1.5em;padding-left:4px}
+.status.err{color:var(--warn);font-weight:600;overflow-wrap:anywhere;user-select:all}
+.grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:20px;align-items:stretch}
+.units{display:flex;flex-direction:column;contain:size}
+.units .tscroll{flex:0 1 auto;min-height:0;max-height:none}
+@media (max-width:1180px){.grid{grid-template-columns:minmax(0,1fr)}.units{contain:none}.units .tscroll{max-height:70vh}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.summary{border-top:4px solid var(--gold)}
+.summary h2{font-size:19px;margin:0;text-wrap:balance}
+.meta{font-size:13px;color:var(--muted);margin:3px 0 14px}
+.big{display:flex;align-items:baseline;gap:8px;margin:2px 0 14px}
+.big b{font:600 30px var(--f-num);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.big span{color:var(--muted);font-size:13px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin:18px 0 10px}
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--soft);margin-bottom:6px}
+.stack i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend span::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--c)}
+.bar-row{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:4px 10px;align-items:center;margin-bottom:9px}
+.bar-row .lab{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.bar-row .lab::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c,var(--e3));flex:none}
+.bar-row .val{text-align:right;font-family:var(--f-num);font-variant-numeric:tabular-nums;font-weight:500}
+.bar{grid-column:1/-1;height:7px;background:var(--soft);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c,var(--e3));border-radius:4px}
+.sub{padding-left:18px;margin-top:-3px}
+.sub .lab{color:var(--muted);font-size:13px;font-weight:400}
+.sub .lab::before{width:6px;height:6px;border-radius:50%;opacity:.7}
+.sub .bar{height:4px}
+.sub .bar i{opacity:.65}
+.turn .bar i{background:var(--gold);opacity:1}
+.turn .lab::before{background:var(--gold)}
+.cells{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.cells div{background:var(--panel);padding:9px 10px;text-align:right}
+.cells .hd{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.cells .rh{text-align:left;font-weight:700}
+.cells .tot{background:var(--gold-soft)}
+.cells .hd.tot{color:var(--ink)}
+.cells .num.tot{font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.note{font-size:12.5px;color:var(--muted);margin:16px 0 0;line-height:1.5;padding:10px 12px;background:var(--soft);border-radius:8px}
+.tablebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.tablebar strong{font-size:15px}
+.tablebar input{width:min(240px,100%)}
+.tscroll{overflow-x:auto;max-height:72vh;overflow-y:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:9px 7px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;z-index:1;background:var(--soft);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);text-align:right;cursor:pointer;user-select:none}
+th:hover{color:var(--ink)}
+th:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+td{text-align:right;font-family:var(--f-num);font-variant-numeric:tabular-nums}
+td:nth-child(2){font-family:var(--f-body);font-weight:600}
+tbody tr:hover td{background:var(--soft)}
+tr.on td{background:var(--gold-soft)!important}
+th .arrow{color:var(--gold)}
+td.mix{min-width:72px;width:12%}
+td.mix .stack{height:9px;margin:0;border-radius:5px}
+td.coll{font-weight:600}
+input[type=checkbox]{accent-color:var(--gold);width:16px;height:16px}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.bar i,.stack i{transition:width .35s ease}}
+</style>
+</head>
+<body>
+<div class="mast pad">
+  <div class="inner">
+    <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 10 2 24l30 14 30-14z" fill="#f3f6fb"/><path d="M14 31v13c0 5 8 9 18 9s18-4 18-9V31L32 39z" fill="#f3f6fb" opacity=".85"/><path d="M56 27v16" stroke="#c99a3b" stroke-width="3"/><circle cx="56" cy="46" r="4" fill="#c99a3b"/></svg>
+      <div><a class="back" href="../">← All tools</a><h1>Education by Geography</h1><p>Educational attainment from the Census Bureau.</p></div>
+    </div>
+    <div class="popbar">
+      <div class="seg" role="group" aria-label="Population">
+        <button type="button" data-pop="voters" aria-pressed="true">Voters</button>
+        <button type="button" data-pop="eligible" aria-pressed="false">Eligible voters</button>
+        <button type="button" data-pop="adults" aria-pressed="false">All adults 25+</button>
+      </div>
+      <span class="hint" id="popHint"></span>
+    </div>
+  </div>
+</div>
+<div class="lift pad">
+<div class="inner">
+  <form class="controls" id="form">
+    <label for="state">State
+      <select id="state"></select>
+    </label>
+    <label for="geo">Geography
+      <select id="geo">
+        <option value="cd">Congressional districts</option>
+        <option value="sldu">State Senate districts</option>
+        <option value="sldl">State House districts</option>
+        <option value="county">Counties</option>
+        <option value="place">Cities and towns</option>
+      </select>
+    </label>
+    <label for="elec" id="elecLab">Voters in
+      <select id="elec">
+        <option value="2024">2024 presidential</option>
+        <option value="2022">2022 midterm</option>
+      </select>
+    </label>
+    <button type="submit" id="go">Load</button>
+  </form>
+  <div class="status" id="status" role="status"></div>
+
+  <div class="grid">
+    <section class="panel summary" aria-labelledby="sumTitle">
+      <h2 id="sumTitle">Statewide</h2>
+      <div class="meta" id="sumMeta"></div>
+      <div id="sumBody"><div class="empty">Pick a state and press Load.</div></div>
+      <div class="actions">
+        <button type="button" class="ghost" id="copySum" disabled>Copy summary for Excel</button>
+        <button type="button" class="ghost" id="clearSel" disabled>Clear selection</button>
+      </div>
+      <p class="note" id="note"></p>
+    </section>
+
+    <section class="panel units" aria-label="Units">
+      <div class="tablebar">
+        <strong id="unitCount">No data loaded</strong>
+        <input id="filter" type="search" placeholder="Filter by name" aria-label="Filter by name">
+        <button type="button" class="ghost" id="copyAll" disabled>Copy table for Excel</button>
+      </div>
+      <div class="tscroll">
+        <table>
+          <thead><tr id="thead"></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+</div>
+
+<script>
+const KEY="2ef2695ee4ba271321f9a5d5147dd83a509d7736";
+const STATES=[["01","Alabama"],["02","Alaska"],["04","Arizona"],["05","Arkansas"],["06","California"],["08","Colorado"],["09","Connecticut"],["10","Delaware"],["11","District of Columbia"],["12","Florida"],["13","Georgia"],["15","Hawaii"],["16","Idaho"],["17","Illinois"],["18","Indiana"],["19","Iowa"],["20","Kansas"],["21","Kentucky"],["22","Louisiana"],["23","Maine"],["24","Maryland"],["25","Massachusetts"],["26","Michigan"],["27","Minnesota"],["28","Mississippi"],["29","Missouri"],["30","Montana"],["31","Nebraska"],["32","Nevada"],["33","New Hampshire"],["34","New Jersey"],["35","New Mexico"],["36","New York"],["37","North Carolina"],["38","North Dakota"],["39","Ohio"],["40","Oklahoma"],["41","Oregon"],["42","Pennsylvania"],["44","Rhode Island"],["45","South Carolina"],["46","South Dakota"],["47","Tennessee"],["48","Texas"],["49","Utah"],["50","Vermont"],["51","Virginia"],["53","Washington"],["54","West Virginia"],["55","Wisconsin"],["56","Wyoming"]];
+const GEO={
+  county:{forv:"county:*",label:"county",plural:"counties"},
+  cd:{forv:"congressional district:*",label:"congressional district",plural:"congressional districts"},
+  sldu:{forv:"state legislative district (upper chamber):*",label:"State Senate district",plural:"State Senate districts"},
+  sldl:{forv:"state legislative district (lower chamber):*",label:"State House district",plural:"State House districts"},
+  place:{forv:"place:*",label:"city or town",plural:"cities and towns"}
+};
+const G=["lessHS","hs","sc","assoc","bach","grad"];
+const POP={
+  voters:{label:"Voters (est.)",short:"voters",hint:"Estimated people who voted: eligible voters in each area, adjusted by the state's actual turnout for each education level (CPS Voting Supplement).",
+    note:"Estimate. Each area's citizens 18+ by education (ACS) are multiplied by the state's turnout rate for that education level, measured by the Census Current Population Survey after the chosen election. Turnout rates are statewide, so local differences in who turns out within an education level aren't captured. CPS turnout is self-reported and runs a little high, but the education mix is what matters here."},
+  eligible:{label:"Eligible voters",short:"citizens 18+",hint:"Citizens 18 and older (ACS). Includes people who don't vote.",
+    note:"Citizens 18 and older, from ACS table B29002. Includes people who are eligible but don't vote, so college grads run lower than in a voter universe. The gender split within each education level comes from the state's 2024 CPS data for citizens 18+, since the ACS table has no gender breakdown."},
+  adults:{label:"All adults 25+",short:"adults 25+",hint:"Every adult 25 and older (ACS), citizens or not.",
+    note:"All adults 25 and older, from ACS table B15002, including noncitizens and nonvoters. The ACS has no separate trade-school or some-grad-school codes: trade certificates fall under some college, and some grad school counts as a bachelor's degree."}
+};
+
+// --- ACS tables ---
+// B15002 (adults 25+, by sex): 001 total; 002 male, 003-018 male cats; 019 female, 020-035 female cats.
+const B15=Array.from({length:35},(_,i)=>"B15002_"+String(i+1).padStart(3,"0")+"E");
+const B15G={lessHS:[1,2,3,4,5,6,7,8],hs:[9],sc:[10,11],assoc:[12],bach:[13],grad:[14,15,16]};
+// B29002 (citizens 18+): 001 total, 002 <9th, 003 9-12 no diploma, 004 HS, 005 some college, 006 associate, 007 bachelor's, 008 grad/professional.
+const B29=Array.from({length:8},(_,i)=>"B29002_"+String(i+1).padStart(3,"0")+"E");
+const B29G={lessHS:[2,3],hs:[4],sc:[5],assoc:[6],bach:[7],grad:[8]};
+// CPS PEEDUCA codes
+const CPSG=c=>c<=38?"lessHS":c===39?"hs":c===40?"sc":c<=42?"assoc":c===43?"bach":"grad";
+
+const zero=()=>Object.fromEntries(G.map(g=>[g,0]));
+const pos=x=>{x=Number(x);return x>0?x:0};
+
+function fromB15(vals){
+  const v=i=>pos(vals[i-1]);
+  const sex=base=>{const o={};for(const g of G)o[g]=B15G[g].reduce((s,k)=>s+v(base+k),0);return o};
+  return {total:v(1),m:sex(2),f:sex(19)};
+}
+// edu: totals by group; rate: multiplier per group; maleShare: share male per group
+function split(edu,rate,maleShare){
+  const m=zero(),f=zero();let total=0;
+  for(const g of G){const n=edu[g]*(rate?rate[g]:1);const ms=maleShare[g];m[g]=n*ms;f[g]=n*(1-ms);total+=n}
+  return {total,m,f};
+}
+function fromB29(vals,cps,mode){
+  const edu={};for(const g of G)edu[g]=B29G[g].reduce((s,k)=>s+pos(vals[k-1]),0);
+  return mode==="voters"?split(edu,cps.turnout,cps.maleVoters):split(edu,null,cps.maleCit);
+}
+function add(a,b){const r={total:a.total+b.total,m:{...a.m},f:{...a.f}};for(const g of G){r.m[g]+=b.m[g];r.f[g]+=b.f[g]}return r}
+function rollup(t){
+  const both=g=>t.m[g]+t.f[g], T=t.total||1;
+  const hsLess=both("lessHS")+both("hs"), scA=both("sc")+both("assoc"), bach=both("bach"), grad=both("grad");
+  const lt=s=>s.lessHS+s.hs+s.sc+s.assoc, ge=s=>s.bach+s.grad;
+  return {total:t.total,hsLess:hsLess/T,lessHS:both("lessHS")/T,hs:both("hs")/T,scA:scA/T,sc:both("sc")/T,assoc:both("assoc")/T,
+    bach:bach/T,grad:grad/T,ltColl:(hsLess+scA)/T,coll:(bach+grad)/T,mLt:lt(t.m)/T,mGe:ge(t.m)/T,fLt:lt(t.f)/T,fGe:ge(t.f)/T};
+}
+
+const $=id=>document.getElementById(id);
+const pct=x=>(x*100).toFixed(1);
+const int=n=>Math.round(n).toLocaleString("en-US");
+let pop="voters", lastUrl="", units=[], stateRow=null, selected=new Set(), sortKey="name", sortDir=1, meta={}, cpsInfo=null;
+const cache=new Map();
+
+function store(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function load(k){try{return localStorage.getItem(k)}catch(e){return null}}
+
+const enc=s=>encodeURIComponent(s).replace(/%3A/g,":").replace(/%2C/g,",").replace(/%2A/g,"*").replace(/%28/g,"(").replace(/%29/g,")");
+async function getJSON(path,params){
+  const q=Object.entries({...params,key:KEY}).map(([k,v])=>`${k}=${enc(v)}`).join("&");
+  const url=`https://api.census.gov/data/${path}?${q}`;
+  if(cache.has(url))return cache.get(url);
+  lastUrl=url;
+  const res=await fetch(url);
+  if(res.status===204)return [];
+  const txt=await res.text();
+  if(!res.ok)throw new Error(`Census API returned ${res.status}: ${txt.slice(0,160)}`);
+  let j;try{j=JSON.parse(txt)}catch(e){throw new Error("Census API sent something other than data: "+txt.slice(0,160))}
+  cache.set(url,j);return j;
+}
+function rows(json,vars){
+  const [hdr,...data]=json;const ni=hdr.indexOf("NAME");const vi=vars.map(v=>hdr.indexOf(v));
+  const geoStart=hdr.findIndex((h,i)=>i>ni&&!vars.includes(h));
+  return data.map(r=>({id:r.slice(geoStart).join("-")+"|"+r[ni],name:shortName(r[ni]),vals:vi.map(i=>r[i])}));
+}
+function shortName(n){return n.split(/;|,/)[0].replace(/\s*\((19|20)\d\d\)/,"").replace(/\s*\(\d+(st|nd|rd|th) Congress\)/,"").trim()}
+
+// CPS: state turnout and gender mix by education, citizens 18+
+async function getCPS(year,st){
+  const j=await getJSON(`${year}/cps/voting/nov`,{get:"PEEDUCA,PES1,PESEX,PRTAGE,PRCITSHP,PWSSWGT",for:"state:"+st});
+  const [hdr,...data]=j;const ix=n=>hdr.indexOf(n);
+  const E=ix("PEEDUCA"),V=ix("PES1"),S=ix("PESEX"),A=ix("PRTAGE"),C=ix("PRCITSHP"),W=ix("PWSSWGT");
+  const cit=zero(),vot=zero(),citM=zero(),votM=zero();let n=0,nv=0,tc=0,tv=0;
+  for(const r of data){
+    const age=+r[A],c=+r[C],e=+r[E],w=+r[W];
+    if(!(age>=18)||!(c>=1&&c<=4)||!(e>=31&&e<=46)||!(w>0))continue;
+    const g=CPSG(e),male=+r[S]===1,voted=+r[V]===1;
+    n++;cit[g]+=w;tc+=w;if(male)citM[g]+=w;
+    if(voted){nv++;vot[g]+=w;tv+=w;if(male)votM[g]+=w}
+  }
+  if(n<100)throw new Error(`The ${year} CPS has too few respondents for this state (${n}) to estimate turnout.`);
+  const turnout={},maleCit={},maleVoters={};
+  for(const g of G){turnout[g]=cit[g]?vot[g]/cit[g]:0;maleCit[g]=cit[g]?citM[g]/cit[g]:.5;maleVoters[g]=vot[g]?votM[g]/vot[g]:maleCit[g]}
+  return {turnout,maleCit,maleVoters,n,nv,overall:tc?tv/tc:0};
+}
+
+// Newest releases are detected at load: any CPS November file or ACS 5-year release newer than the
+// last known one is picked up automatically once the Census Bureau publishes it.
+const KNOWN_CPS=[2024,2022], KNOWN_ACS=2024, THIS_YEAR=new Date().getFullYear();
+let acsYear=null;
+function acsCandidates(){
+  if(acsYear)return [acsYear];
+  const out=[];for(let y=THIS_YEAR;y>KNOWN_ACS;y--)out.push(String(y));
+  return [...out,String(KNOWN_ACS),String(KNOWN_ACS-1)];
+}
+async function probe(url){
+  try{const r=await fetch(url);if(!r.ok)return false;const j=await r.json();return Array.isArray(j)&&j.length>1}catch(e){return false}
+}
+async function detectElections(){
+  const extra=[];for(let y=THIS_YEAR;y>KNOWN_CPS[0];y--)if(y%2===0)extra.push(y);
+  const found=await Promise.all(extra.map(y=>probe(`https://api.census.gov/data/${y}/cps/voting/nov?get=PES1&for=state:11&key=${KEY}`).then(ok=>ok?y:null)));
+  const years=[...found.filter(Boolean),...KNOWN_CPS];
+  const sel=$("elec"), want=load("edu.elec");
+  sel.innerHTML=years.map(y=>`<option value="${y}">${y} ${y%4===0?"presidential":"midterm"}</option>`).join("");
+  sel.value=years.map(String).includes(want)?want:String(years[0]);
+}
+function initForm(){
+  $("state").innerHTML=STATES.map(([f,n])=>`<option value="${f}">${n}</option>`).join("");
+  $("state").value=load("edu.state")||"26";
+  $("geo").value=load("edu.geo2")||"cd";
+  pop=load("edu.pop")||"voters"; if(!POP[pop])pop="voters";
+  syncPop();
+}
+function syncPop(){
+  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pop===pop));
+  $("popHint").textContent=POP[pop].hint; $("note").textContent=POP[pop].note;
+  $("elecLab").hidden=pop!=="voters";
+}
+
+async function run(e){
+  e&&e.preventDefault();
+  const st=$("state").value, geo=$("geo").value, elec=$("elec").value; let year;
+  store("edu.state",st);store("edu.geo2",geo);store("edu.elec",elec);store("edu.pop",pop);
+  const stName=STATES.find(s=>s[0]===st)[1];
+  setStatus(`Loading ${stName}…`);$("go").disabled=true;
+  try{
+    let make, vars, cps=null;
+    if(pop==="adults"){vars=B15;make=v=>fromB15(v)}
+    else{vars=B29;cps=await getCPS(pop==="voters"?elec:"2024",st); make=v=>fromB29(v,cps,pop)}
+    const get="NAME,"+vars.join(",");
+    const fetchACS=y=>Promise.all([getJSON(`${y}/acs/acs5`,{get,for:"state:"+st}),getJSON(`${y}/acs/acs5`,{get,for:GEO[geo].forv,in:"state:"+st})]);
+    let sJ,uJ,lastErr;
+    for(const y of acsCandidates()){
+      try{[sJ,uJ]=await fetchACS(y);year=y;acsYear=y;break}
+      catch(err){if(err instanceof TypeError)throw err;lastErr=err}
+    }
+    if(!sJ)throw lastErr;
+    const sr=rows(sJ,vars)[0]; stateRow={...sr,t:make(sr.vals)};
+    units=rows(uJ,vars).map(u=>{const t=make(u.vals);return {...u,t,r:rollup(t)}}).filter(u=>u.t.total>0);
+    selected.clear(); meta={stName,geo,year,elec,pop}; cpsInfo=cps;
+    let msg=`Loaded ${units.length} ${units.length===1?GEO[geo].label:GEO[geo].plural} in ${stName}. ACS ${year-4}–${year}.`;
+    if(cps&&pop==="voters")msg+=` CPS ${elec}: ${int(cps.n)} eligible respondents, ${pct(cps.overall)}% reported voting.`;
+    setStatus(msg); render();
+  }catch(err){
+    setStatus((err instanceof TypeError?"Couldn't reach the Census API (the browser blocked or lost the request).":err.message)+" Test link: "+lastUrl,true);
+  }finally{$("go").disabled=false}
+}
+function setStatus(msg,err){$("status").textContent=msg;$("status").className="status"+(err?" err":"")}
+
+function current(){
+  if(!selected.size)return {title:meta.stName?`${meta.stName} statewide`:"Statewide",t:stateRow&&stateRow.t,n:0};
+  const picks=units.filter(u=>selected.has(u.id));
+  const t=picks.reduce((a,u)=>add(a,u.t),{total:0,m:zero(),f:zero()});
+  return {title:picks.length===1?(meta.geo==="county"||meta.geo==="place"?picks[0].name+", "+meta.stName:meta.stName+" "+picks[0].name):`Combined area (${picks.length} ${GEO[meta.geo].plural})`,t,n:picks.length,names:picks.map(p=>p.name)};
+}
+function source(){
+  const P=POP[meta.pop];
+  return meta.pop==="voters"?`Est. ${meta.elec} voters · ACS ${meta.year-4}–${meta.year} + CPS ${meta.elec}`
+    :`${P.label} · ACS ${meta.year-4}–${meta.year}`;
+}
+function renderSummary(){
+  const c=current(); $("sumTitle").textContent=c.title;
+  if(!c.t){$("sumBody").innerHTML='<div class="empty">Pick a state and press Load.</div>';$("sumMeta").textContent="";return}
+  const r=rollup(c.t);
+  $("sumMeta").innerHTML=source()+(c.n>1?`<br>${c.names.slice(0,6).join(", ")}${c.n>6?`, +${c.n-6} more`:""}`:"");
+  const bar=(lab,x,col,cls)=>`<div class="bar-row ${cls||""}" style="--c:var(${col})"><span class="lab">${lab}</span><span class="val">${pct(x)}%</span><div class="bar"><i style="width:${x*100}%"></i></div></div>`;
+  $("sumBody").innerHTML=`<div class="big"><b>${int(r.total)}</b><span>${meta.pop==="voters"?"estimated voters":POP[meta.pop].short}</span></div>`+
+    stack(r,true)+
+    `<h3>GPS education groups</h3>`+
+    bar("High school or less",r.hsLess,"--e1")+bar("Less than high school",r.lessHS,"--e1","sub")+bar("High school graduate",r.hs,"--e1","sub")+
+    bar("Some college / Associate",r.scA,"--e2")+bar("Some college, no degree",r.sc,"--e2","sub")+bar("Associate degree",r.assoc,"--e2","sub")+
+    bar("Four-year degree",r.bach,"--e3")+bar("Graduate degree",r.grad,"--e4")+
+    `<h3>College by gender (share of total)</h3>
+    <div class="cells">
+      <div class="hd"></div><div class="hd tot">Total</div><div class="hd">Male</div><div class="hd">Female</div>
+      <div class="rh">&lt;Coll</div><div class="num tot">${pct(r.ltColl)}%</div><div class="num">${pct(r.mLt)}%</div><div class="num">${pct(r.fLt)}%</div>
+      <div class="rh">Coll+</div><div class="num tot">${pct(r.coll)}%</div><div class="num">${pct(r.mGe)}%</div><div class="num">${pct(r.fGe)}%</div>
+    </div>`+
+    (cpsInfo&&meta.pop==="voters"?`<h3>${meta.stName} turnout by education, ${meta.elec} (CPS)</h3>`+
+      [["Less than HS","lessHS"],["High school grad","hs"],["Some college","sc"],["Associate","assoc"],["Bachelor's","bach"],["Graduate","grad"]]
+      .map(([l,g])=>bar(l,cpsInfo.turnout[g],"--gold","sub turn")).join(""):"");
+}
+function stack(r,legend){
+  const seg=[[r.hsLess,"--e1","HS or less"],[r.scA,"--e2","Some coll/Assoc"],[r.bach,"--e3","4-year"],[r.grad,"--e4","Grad"]];
+  return `<div class="stack" role="img" aria-label="${seg.map(x=>x[2]+" "+pct(x[0])+"%").join(", ")}">${seg.map(([x,c])=>`<i style="width:${x*100}%;background:var(${c})"></i>`).join("")}</div>`+
+    (legend?`<div class="legend">${seg.map(([,c,l])=>`<span style="--c:var(${c})">${l}</span>`).join("")}</div>`:"");
+}
+function rowName(n){return /^(cd|sldu|sldl)$/.test(meta.geo)?n.replace(/^(Congressional|State Senate|State House|State Legislative)\s+/,""):n}
+function COLS(){return [["name","Name"],["hsLess","HS or less"],["scA","Coll/Assoc"],["bach","4-year"],["grad","Grad"],["ltColl","<Coll"],["coll","Coll+"],["mix","Mix"]]}
+function renderTable(){
+  $("thead").innerHTML='<th scope="col"><span aria-label="Select"></span></th>'+COLS().map(([k,l])=>
+    `<th scope="col" data-k="${k}">${l.replace("<","&lt;")} <span class="arrow">${sortKey===k?(sortDir>0?"▲":"▼"):""}</span></th>`).join("");
+  const q=$("filter").value.trim().toLowerCase();
+  const list=units.filter(u=>!q||u.name.toLowerCase().includes(q)).sort((a,b)=>{
+    const key=sortKey==="mix"?"coll":sortKey;const va=key==="name"?a.name:a.r[key], vb=key==="name"?b.name:b.r[key];
+    return (typeof va==="string"?va.localeCompare(vb,undefined,{numeric:true}):va-vb)*sortDir});
+  $("unitCount").textContent=units.length?`${units.length} ${GEO[meta.geo].plural}${selected.size?` · ${selected.size} selected`:""}`:"No data loaded";
+  $("tbody").innerHTML=list.length?list.map(u=>`<tr class="${selected.has(u.id)?"on":""}">
+    <td><input type="checkbox" data-id="${u.id.replace(/"/g,"&quot;")}" ${selected.has(u.id)?"checked":""} aria-label="Include ${u.name}"></td>
+    <td>${rowName(u.name)}</td><td>${pct(u.r.hsLess)}</td><td>${pct(u.r.scA)}</td><td>${pct(u.r.bach)}</td><td>${pct(u.r.grad)}</td><td class="coll">${pct(u.r.ltColl)}</td><td class="coll">${pct(u.r.coll)}</td><td class="mix">${stack(u.r)}</td></tr>`).join("")
+    :`<tr><td colspan="9" class="empty">${units.length?"No matches.":"Load a state to see its units."}</td></tr>`;
+  $("copyAll").disabled=!units.length;
+}
+function render(){renderSummary();renderTable();$("copySum").disabled=!stateRow;$("clearSel").disabled=!selected.size}
+
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{if(pop===b.dataset.pop)return;pop=b.dataset.pop;syncPop();run()}));
+$("elec").addEventListener("change",()=>{if(pop==="voters")run()});
+$("thead").addEventListener("click",e=>{const th=e.target.closest("th[data-k]");if(!th)return;
+  const k=th.dataset.k; sortDir=sortKey===k?-sortDir:(k==="name"?1:-1); sortKey=k; renderTable()});
+$("tbody").addEventListener("change",e=>{const id=e.target.dataset.id;if(!id)return;
+  e.target.checked?selected.add(id):selected.delete(id); render()});
+$("filter").addEventListener("input",renderTable);
+$("clearSel").addEventListener("click",()=>{selected.clear();render()});
+$("form").addEventListener("submit",run);
+
+async function copy(text,btn){
+  const old=btn.textContent;
+  try{await navigator.clipboard.writeText(text);btn.textContent="Copied"}
+  catch(e){const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");btn.textContent="Copied"}catch(_){btn.textContent="Copy failed"}ta.remove()}
+  setTimeout(()=>btn.textContent=old,1500);
+}
+$("copySum").addEventListener("click",e=>{const c=current();if(!c.t)return;const r=rollup(c.t);
+  const L=[["Area",c.title],["Population",POP[meta.pop].label],["Source",source()],["Count",Math.round(r.total)],[],
+    ["Group","Percent"],["High school or less",pct(r.hsLess)],["Some college/Associate",pct(r.scA)],["Four-year degree",pct(r.bach)],["Graduate degree",pct(r.grad)],[],
+    ["","Total","Male","Female"],["<Coll",pct(r.ltColl),pct(r.mLt),pct(r.fLt)],["Coll+",pct(r.coll),pct(r.mGe),pct(r.fGe)]];
+  copy(L.map(x=>x.join("\t")).join("\n"),e.target)});
+$("copyAll").addEventListener("click",e=>{
+  const L=[["Name","HS or less %","Some coll/Assoc %","4-year %","Grad %","<Coll %","Coll+ %","Men <Coll %","Men Coll+ %","Women <Coll %","Women Coll+ %"]];
+  units.forEach(u=>{const r=u.r;L.push([u.name,pct(r.hsLess),pct(r.scA),pct(r.bach),pct(r.grad),pct(r.ltColl),pct(r.coll),pct(r.mLt),pct(r.mGe),pct(r.fLt),pct(r.fGe)])});
+  copy(L.map(x=>x.join("\t")).join("\n"),e.target)});
+
+initForm(); detectElections().then(()=>run());
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@ import { chromium } from "playwright";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 
-const page_url = pathToFileURL(resolve("index.html")).href;
+const page_url = pathToFileURL(resolve("education/index.html")).href;
 const cases = [
   { state: "26", geo: "cd", pop: "voters" },   // Michigan CDs, voters
   { state: "16", geo: "county", pop: "eligible" }, // Idaho counties, eligible
@@ -43,6 +43,20 @@ for (const c of cases) {
   const ok = !res.err && res.n > 0 && res.bad.length === 0 && errors.length === 0;
   console.log(`${ok ? "PASS" : "FAIL"} ${c.state}/${c.geo}/${c.pop}: ${res.status}${res.coll != null ? ` | statewide Coll+ ${(res.coll * 100).toFixed(1)}%` : ""}`);
   for (const b of [...res.bad, ...errors]) console.log("   - " + b);
+  if (!ok) failed++;
+  await page.close();
+}
+// Rim Weighting and the home page: load cleanly with no script errors.
+for (const f of ["weighting/index.html", "index.html"]) {
+  const page = await browser.newPage();
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(pathToFileURL(resolve(f)).href);
+  await page.waitForTimeout(1500);
+  const title = await page.title();
+  const ok = errors.length === 0 && title.length > 0;
+  console.log(`${ok ? "PASS" : "FAIL"} ${f}: "${title}"`);
+  for (const e of errors) console.log("   - " + e);
   if (!ok) failed++;
   await page.close();
 }

@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rim Weighting</title>
+<style id="pagestyle">@page{size:portrait;margin:0.45in 0.4in}</style>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2232%22%20height=%2232%22%20viewBox=%220%200%2032%2032%22%3E%3Crect%20width=%2232%22%20height=%2232%22%20rx=%227%22%20fill=%22%231F4E79%22/%3E%3Crect%20x=%227%22%20y=%2217%22%20width=%224.5%22%20height=%229%22%20rx=%221%22%20fill=%22%23ffffff%22/%3E%3Crect%20x=%2213.75%22%20y=%2210%22%20width=%224.5%22%20height=%2216%22%20rx=%221%22%20fill=%22%23ffffff%22/%3E%3Crect%20x=%2220.5%22%20y=%2213.5%22%20width=%224.5%22%20height=%2212.5%22%20rx=%221%22%20fill=%22%238FB8DC%22/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#F6F7F7; --surface:#FFFFFF; --ink:#15181B; --muted:#666E76; --faint:#8B939B;
+    --rule:#DCE0E3; --rule-strong:#B9C0C6; --accent:#1F4E79; --accent-soft:#EAF0F6;
+    --ok:#186A3B; --ok-soft:#E8F3EC; --bad:#A32017; --bad-soft:#FBEBE9; --warn:#8A5A00; --warn-soft:#FBF2E0;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 24px 96px}
+  h1{font-size:21px;font-weight:600;margin:0;letter-spacing:-.01em}
+  h2{font-size:16px;font-weight:600;margin:0 0 14px}
+  .sub{color:var(--muted);font-size:13px;margin:3px 0 0}
+  header{padding-bottom:16px;border-bottom:1px solid var(--rule-strong);margin-bottom:24px;
+    padding-right:320px}
+  section{margin-bottom:30px}
+  .panel{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:18px 20px}
+  button{font:inherit;font-size:13px;padding:7px 13px;border:1px solid var(--rule-strong);
+    background:var(--surface);color:var(--ink);border-radius:5px;cursor:pointer}
+  button:hover{background:var(--paper);border-color:var(--muted)}
+  button:active{transform:translateY(.5px)}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.primary:hover{background:#1a4266}
+  button:disabled,button:disabled:hover{opacity:.4;cursor:default;background:var(--surface);border-color:var(--rule-strong);color:var(--ink)}
+  button.mini{padding:3px 8px;font-size:12px}
+  button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  select,input[type=text],input[type=number]{font:inherit;font-size:13px;padding:6px 8px;
+    border:1px solid var(--rule-strong);border-radius:5px;background:var(--surface);color:var(--ink)}
+  input[type=number]{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;text-align:right}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;font-weight:600;color:var(--muted);padding:7px 8px;border-bottom:1px solid var(--rule-strong);white-space:nowrap}
+  td{padding:6px 8px;border-bottom:1px solid var(--rule)}
+  th.r,td.r{text-align:right}
+  tr.total td{border-bottom:none;font-weight:600;padding-top:9px}
+  .drop{border:2px dashed var(--rule-strong);border-radius:8px;padding:52px 24px;text-align:center;background:var(--surface)}
+  .drop.over{border-color:var(--accent);background:var(--accent-soft)}
+  .drop p{margin:0 0 14px;color:var(--muted);font-size:14px}
+  .drop p.droplabel{margin:0 0 8px;font-size:12px;font-weight:600;color:var(--accent);
+    text-transform:uppercase;letter-spacing:.04em}
+  .hide{display:none!important}
+  .facts{display:flex;flex-wrap:wrap;gap:26px}
+  .fact .k{font-size:12px;color:var(--muted)}
+  .fact .v{font-size:19px;font-weight:600;margin-top:1px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  .chip{padding:6px 12px;border:1px solid var(--rule-strong);border-radius:5px;background:var(--surface);
+    cursor:pointer;font-size:13px}
+  .chip[aria-selected=true]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .rim{border:1px solid var(--rule);border-radius:6px;margin-bottom:12px;background:var(--surface)}
+  .rim>header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+    padding:11px 14px;margin:0;border:none;border-bottom:1px solid var(--rule)}
+  .rim h3{font-size:14px;font-weight:600;margin:0;line-height:1.4}
+  .rim .vn{font-size:12px;color:var(--faint);margin-top:1px}
+  .rim table{margin:0;table-layout:fixed;width:auto}
+  .rim col.r-code{width:52px}
+  .rim col.r-label{width:var(--labelw,360px)}
+  .rim col.r-hist{width:var(--histw,112px)}
+  .rim col.r-cur{width:126px}
+  .rim col.r-target{width:104px}
+  .rim col.r-diff{width:96px}
+  .rim td,.rim th{padding-left:14px}
+  .rim td:last-child,.rim th:last-child{padding-right:14px}
+  .note{font-size:13px;padding:9px 12px;border-radius:5px;margin:0 0 12px}
+  .note.warn{background:var(--warn-soft);color:var(--warn)}
+  .note.bad{background:var(--bad-soft);color:var(--bad)}
+  .note.info{background:var(--accent-soft);color:var(--accent)}
+  .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)} .muted{color:var(--muted)}
+  .diag{display:flex;flex-wrap:wrap;gap:22px;padding:12px 14px;background:var(--paper);
+    border:1px solid var(--rule);border-radius:6px;margin-top:14px;font-size:13px}
+  .diag .k{color:var(--muted);font-size:12px}
+  .diag .v{font-weight:600;margin-top:1px}
+  pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.6;
+    margin:0;padding:14px;white-space:pre-wrap;word-break:break-word;background:var(--surface)}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;
+    padding:10px 14px;border-bottom:1px solid var(--rule);background:var(--paper)}
+  .resume{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+    background:var(--accent-soft);border:1px solid #C9D8E8;border-radius:8px;padding:16px 20px;margin-top:18px}
+  .resume .rtext{min-width:0}
+  .resume .rlabel{margin:0 0 3px;font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}
+  .resume .rfile{margin:0;font-size:16px;font-weight:600;overflow-wrap:anywhere}
+  .resume .rnote{margin:6px 0 0;font-size:13px;color:var(--ink)}
+  #resumebtn{font-size:14px;font-weight:600;padding:10px 26px}
+  table.recent td,table.recent th{padding:10px 14px}
+  table.recent tr:last-child td{border-bottom:none}
+  table.recent td:nth-child(1){overflow-wrap:anywhere;min-width:150px}
+  table.recent td:nth-child(2){min-width:120px}
+  table.recent td:nth-child(3){white-space:nowrap}
+  table.recent td:nth-child(4){width:36%;min-width:200px}
+  #recent textarea.noteinp{display:block;width:100%;padding:6px 8px;font:inherit;font-size:13px;line-height:1.45;
+    border:1px solid var(--rule);border-radius:5px;background:var(--surface);color:var(--ink);
+    resize:none;overflow:hidden;min-height:31px}
+  #recent textarea.noteinp:hover{border-color:var(--rule-strong)}
+  #recent textarea.noteinp:focus{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:0}
+  #recent textarea.noteinp::placeholder{color:var(--faint)}
+  @media (max-width:1320px){ body:not(.hasfile) .wrap{margin-right:auto;max-width:1180px} }
+  body:not(.hasfile) header{padding-right:0}
+  h1 .ver{font-size:13px;font-weight:500;color:var(--faint);margin-left:6px;letter-spacing:0;vertical-align:2px}
+  #projbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:12px}
+  #s-summary .projid{padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--rule)}
+  #fileinfo{font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;overflow-wrap:anywhere}
+  #savestate{font-size:13.5px;margin:3px 0 0}
+  #newproj,#newproj2{font-size:14px;font-weight:600;padding:9px 18px}
+  #newproj span,#newproj2 span{font-size:17px;line-height:1;margin-right:3px;vertical-align:-1px}
+  #savestate.warn{color:var(--warn)}
+  .rimscroll{overflow-x:auto}
+  .rim th.hist,.rim td.hist{background:var(--paper)}
+  .rim .hnote{font-weight:400;font-size:11px}
+  #colpicker{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:9px 320px 12px 0;
+    border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-bottom:14px}
+  @media (max-width:900px){ #colpicker{padding-right:0} }
+  #colpicker .lbl{font-size:12px;color:var(--muted);margin-right:2px}
+  #colpicker .hint{color:var(--faint);font-weight:400}
+  .colchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 4px 4px 6px;
+    border-radius:5px;cursor:grab;border:1px solid var(--accent);background:var(--accent-soft);
+    color:var(--accent);font-weight:600;user-select:none}
+  .colchip:active{cursor:grabbing}
+  .colchip.off{background:var(--surface);border-color:var(--rule-strong);color:var(--faint);font-weight:400}
+  .colchip .grip{letter-spacing:-3px;color:var(--faint);font-size:11px;cursor:grab}
+  .colchip .eye{border:none;background:none;padding:0 4px;font-size:13px;line-height:1;
+    color:inherit;opacity:.55;border-radius:3px}
+  .colchip .eye:hover{opacity:1;background:rgba(0,0,0,.06);border:none}
+  .colchip.dragging{opacity:.4}
+  .colchip.over{box-shadow:-3px 0 0 0 var(--accent)}
+  .colchip:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  mark{background:#FDF0C3;color:inherit;border-radius:2px;padding:0 1px;scroll-margin-top:120px}
+  mark.active{background:#F5A524;box-shadow:0 0 0 2px #F5A524}
+  #topline{overflow-x:auto;padding-left:0;padding-right:0}
+  #topline .qblock{padding-left:20px;padding-right:20px}
+  #topline table{table-layout:fixed;width:auto}
+  #topline col.c-code{width:52px}
+  #topline col.c-resp{width:var(--respw,420px)}
+  #topline col.c-data{width:var(--dataw,130px)}
+  #topline th,#topline td{overflow-wrap:normal;word-break:normal;white-space:normal}
+  .rim th{overflow-wrap:normal;word-break:normal;white-space:normal}
+  tr.net td{background:var(--accent-soft);font-weight:600;border-bottom:1px solid var(--rule)}
+  tr.sub-row td:nth-child(2){padding-left:26px;color:var(--muted)}
+  .qtop{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;position:relative}
+  .qmeta{min-width:0}
+  .addwt{flex-shrink:0;white-space:nowrap}
+  .added{flex-shrink:0;font-size:12px;color:var(--faint);white-space:nowrap;padding-top:3px}
+  .scenmenu{position:absolute;right:0;top:26px;z-index:15;background:var(--surface);
+    border:1px solid var(--rule-strong);border-radius:7px;padding:6px;min-width:210px;
+    box-shadow:0 3px 12px rgba(21,24,27,.14)}
+  .scenmenu .mhead{font-size:12px;color:var(--muted);margin:2px 6px 6px}
+  .mitem{display:block;width:100%;text-align:left;border:none;background:none;padding:6px 8px;
+    border-radius:5px;font-size:13px}
+  .mitem:hover:not(:disabled){background:var(--accent-soft);border:none}
+  .mitem:disabled{color:var(--faint);cursor:default}
+  .mitem.cancel{color:var(--muted);border-top:1px solid var(--rule);border-radius:0;margin-top:4px;padding-top:8px}
+  .qblock{border-bottom:1px solid var(--rule);padding:16px 0}
+  .qblock:last-child{border-bottom:none}
+  .qh{font-size:14px;font-weight:600;margin:0 0 2px;line-height:1.4}
+  .qm{font-size:12px;color:var(--faint);margin:0 0 9px}
+  .tag{display:inline-block;font-size:11px;padding:1px 6px;border-radius:3px;margin-left:6px;vertical-align:1px}
+  .tag.rim{background:var(--accent-soft);color:var(--accent)}
+  .tag.mr{background:var(--warn-soft);color:var(--warn)}
+  .tag.drift{background:var(--bad-soft);color:var(--bad)}
+  .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  label{font-size:13px;color:var(--muted)}
+  .sticky{position:sticky;top:0;background:var(--surface);z-index:2}
+  #jump{position:fixed;right:16px;top:16px;width:290px;display:flex;flex-direction:column;gap:7px;
+    z-index:30;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:8px;
+    box-shadow:0 2px 10px rgba(21,24,27,.10)}
+  #jump input{width:100%}
+  #jump nav button{padding:7px 0;text-align:center;font-size:12px;font-weight:600}
+  #jump nav button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+  #clearsearch:hover{background:none;border:none;color:var(--ink)}
+  @media (max-width:1320px){ .wrap{max-width:none;margin-right:330px} }
+  @media (max-width:900px){ .wrap{margin-right:0;padding:18px 14px 72px}
+    header{padding-top:56px;padding-right:0}
+    #jump{width:auto;left:14px;right:14px;top:8px;flex-direction:row;align-items:center;padding:6px}
+    #jump #searchwrap{flex:1} #jump nav button{padding:7px 10px} }
+  @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+  #printhdr{display:none}
+  .lshort{display:none}
+  .hnote2{font-weight:400;font-size:11px}
+  @media print{
+    html,body{background:#fff}
+    body{font-size:9pt;margin:0}
+    .wrap{max-width:none;margin:0;padding:0}
+    header,#s-summary,#s-scen,#s-syntax,#s-load,#jump,#colpicker,
+    #s-top h2,#s-top .controls,[data-addvar],.added,.scenmenu{display:none!important}
+    #printhdr{display:block;margin:0 0 8pt;padding:0 0 5pt;border-bottom:1.5px solid #333}
+    #printhdr .ph-file{font-size:11pt;font-weight:700;line-height:1.25}
+    #printhdr .ph-meta{font-size:7.5pt;color:#444;margin-top:2pt;line-height:1.35}
+    #s-top{margin:0}
+    #topline{--dataw:80px!important;overflow:visible;border:none;border-radius:0;padding:0;background:none}
+    #topline table{min-width:0!important;width:100%;font-size:9pt}
+    #topline col.c-code{width:32px!important}
+    #topline .qblock{padding:0 0 5pt;margin:0 0 5pt;border-bottom:1px solid #ccc;
+      break-inside:avoid;page-break-inside:avoid}
+    #topline .qblock.splitok{break-inside:auto;page-break-inside:auto}
+    #topline .qblock.splitok tr{break-inside:avoid;page-break-inside:avoid}
+    #topline .qblock.splitok .qmeta,#topline .qblock.splitok .qtop{break-after:avoid;page-break-after:avoid}
+    #topline .qtop{display:block}
+    #topline .qh{font-size:9pt;font-weight:700;margin:0;line-height:1.25;display:inline}
+    #topline .qm{font-size:7pt;margin:0;display:inline}
+    #topline .qm::before{content:' · '}
+    #topline .qmeta{margin:0 0 2pt}
+    .lfull{display:none} .lshort{display:inline}
+    .hnote2{font-size:6.5pt}
+    #topline th,#topline td{overflow-wrap:normal;line-height:1.2}
+    #topline th{font-size:7.5pt;padding:1pt 4pt;border-bottom:1px solid #999;vertical-align:bottom}
+    #topline td{padding:1.5pt 4pt;border-bottom:1px solid #eee}
+    #topline tr.net td,#topline mark,#topline .tag{
+      -webkit-print-color-adjust:exact;print-color-adjust:exact}
+    #topline tr.net td{border-bottom:1px solid #ccc}
+    #topline tr.sub-row td:nth-child(2){padding-left:14pt}
+    #topline tr.total td{padding-top:2.5pt}
+    .tag{font-size:6.5pt;padding:0 3pt}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>Rim Weighting <span class="ver" title="Version 1.2">v1.2</span></h1>
+    <p class="sub">Reads an SPSS .sav file in this browser, builds rake schemes, and writes SPSSINC RAKE syntax. Your data never leaves this computer.</p>
+    <div id="projbar" class="hide">
+      <button class="primary" id="newproj"><span aria-hidden="true">+</span> New Project/Saved Projects</button>
+    </div>
+    <p id="restored" class="note info hide" style="margin:10px 0 0"></p>
+  </div>
+</header>
+
+<section id="s-load">
+  <div class="drop" id="drop">
+    <p class="droplabel">Start a new project</p>
+    <p>Drop a .sav file here</p>
+    <button class="primary" id="pick">Choose file</button>
+    <input type="file" id="fileinput" accept=".sav" class="hide">
+    <p id="loaderr" class="bad hide" style="margin-top:14px"></p>
+  </div>
+  <div id="resume"></div>
+  <div id="recent"></div>
+</section>
+
+<section id="s-summary" class="hide">
+  <div class="panel">
+    <div class="projid">
+      <div id="fileinfo" class="num"></div>
+      <div id="savestate" class="sub"></div>
+    </div>
+    <div class="facts" id="facts"></div>
+    <div id="wavebox" style="margin-top:16px"></div>
+  </div>
+</section>
+
+<section id="s-scen" class="hide">
+  <h2>Weighting Scenarios</h2>
+  <div class="chips" id="scenchips"></div>
+  <div id="scenbody"></div>
+</section>
+
+<section id="s-top" class="hide">
+  <div id="printhdr"></div>
+  <h2>Topline</h2>
+  <div class="controls" style="margin-bottom:12px">
+    <button id="pdfbtn" title="Downloads the topline as a PDF">Save as PDF</button>
+    <span id="pdfstat" class="sub"></span>
+  </div>
+  <div class="controls">
+    <label for="qfilter">Show</label>
+    <select id="qfilter">
+      <option value="all">All questions</option>
+      <option value="nonrim">Exclude rim variables</option>
+      <option value="moved">Only questions that move 3+ points</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+      <input type="checkbox" id="netsbox" checked style="width:15px;height:15px"> Combine intensities
+    </label>
+    <span id="topmeta" class="sub"></span>
+  </div>
+  <div id="colpicker"></div>
+  <div class="panel" id="topline"></div>
+</section>
+
+<section id="s-syntax" class="hide">
+  <h2>SPSS Syntax</h2>
+  <div class="controls">
+    <label for="synpick">Export syntax for</label>
+    <select id="synpick"></select>
+  </div>
+  <div class="panel" style="padding:0;overflow:hidden">
+    <div class="toolbar">
+      <span id="synmeta" class="sub"></span>
+      <button id="copy">Copy to clipboard</button>
+    </div>
+    <div id="synwarn"></div>
+    <pre id="syntax"></pre>
+  </div>
+  <p id="copystat" class="sub" style="min-height:18px;margin-top:8px"></p>
+  <div style="margin-top:22px">
+    <button class="primary" id="newproj2"><span aria-hidden="true">+</span> New Project/Saved Projects</button>
+  </div>
+</section>
+
+</div>
+
+<div id="jump" class="hide">
+  <div id="searchwrap" style="position:relative">
+    <input type="text" id="search" placeholder="Search variables or keywords" autocomplete="off"
+      aria-label="Search variables or keywords" style="width:100%;padding-right:26px">
+    <button id="clearsearch" class="hide" aria-label="Clear search"
+      style="position:absolute;right:3px;top:50%;transform:translateY(-50%);border:none;background:none;
+      padding:2px 7px;color:var(--muted);font-size:16px;line-height:1;box-shadow:none">&times;</button>
+  </div>
+  <div id="matchcount" class="hide" style="display:flex;align-items:center;justify-content:space-between;
+    gap:6px;font-size:12px;color:var(--muted);padding:0 2px">
+    <span id="matchtext"></span>
+    <span style="display:flex;gap:4px">
+      <button id="prevmatch" class="mini" aria-label="Previous match" style="padding:2px 8px">&uarr;</button>
+      <button id="nextmatch" class="mini" aria-label="Next match" style="padding:2px 8px">&darr;</button>
+    </span>
+  </div>
+  <nav aria-label="Page navigation" style="display:flex;gap:6px">
+    <button id="gotop" title="Jump to top" style="flex:1">Top</button>
+    <button id="gobot" title="Jump to bottom" style="flex:1">Bottom</button>
+  </nav>
+</div>
+
+<script>
+/* ==== SAV PARSER ==== */
+function parseSav(buffer){
+  const dv=new DataView(buffer); let p=0;
+  const magic=String.fromCharCode(dv.getUint8(0),dv.getUint8(1),dv.getUint8(2),dv.getUint8(3));
+  if(magic==='$FL3') throw new Error('This is a compressed .zsav file. Re-save it as an uncompressed .sav in SPSS.');
+  if(magic!=='$FL2') throw new Error('Not an SPSS .sav file.');
+  let little=true; const probe=new DataView(buffer,64,4);
+  if(probe.getInt32(0,true)!==2&&probe.getInt32(0,true)!==3) little=false;
+  const I=()=>{const v=dv.getInt32(p,little);p+=4;return v};
+  const D=()=>{const v=dv.getFloat64(p,little);p+=8;return v};
+  const S=n=>{let s='';for(let i=0;i<n;i++)s+=String.fromCharCode(dv.getUint8(p+i));p+=n;return s};
+  const B=n=>{const b=new Uint8Array(buffer,p,n);p+=n;return b};
+  p=4; const product=S(60).trim(); I(); I();
+  const compression=I(); const weightIndex=I(); let nCases=I(); const bias=D();
+  S(9); S(8); const fileLabel=S(64).trim(); p+=3;
+  const vars=[],rawVL=[],mrRaw=[]; let encoding='utf-8',longNames=null,done=false;
+  while(!done){
+    const rec=I();
+    if(rec===2){
+      const type=I(),hasLabel=I(),nMissing=I(),printFmt=I(); I();
+      const name=S(8).trim(); let label='';
+      if(hasLabel){const len=I();const pad=Math.ceil(len/4)*4;const b=B(pad);
+        label=new TextDecoder(encoding).decode(b.slice(0,len));}
+      const missing=[]; for(let i=0;i<Math.abs(nMissing);i++) missing.push(D());
+      vars.push({type,name,label,printFmt,nMissing,missing,isCont:type===-1});
+    } else if(rec===3){
+      const count=I(),labels=[];
+      for(let i=0;i<count;i++){const val=D();const len=dv.getUint8(p);p+=1;
+        const tot=Math.ceil((len+1)/8)*8-1;const b=B(tot);
+        labels.push([val,new TextDecoder(encoding).decode(b.slice(0,len))]);}
+      rawVL.push({labels,varIndices:null});
+    } else if(rec===4){
+      const count=I(),idx=[]; for(let i=0;i<count;i++) idx.push(I());
+      rawVL[rawVL.length-1].varIndices=idx;
+    } else if(rec===6){ const n=I(); p+=n*80; }
+    else if(rec===7){
+      const sub=I(),size=I(),count=I(),nB=size*count,start=p;
+      if(sub===20){encoding=new TextDecoder('ascii').decode(new Uint8Array(buffer,start,nB)).trim().toLowerCase();
+        if(encoding==='utf8')encoding='utf-8';}
+      else if(sub===13) longNames=new TextDecoder('utf-8').decode(new Uint8Array(buffer,start,nB));
+      else if(sub===7||sub===19) mrRaw.push(new TextDecoder('utf-8').decode(new Uint8Array(buffer,start,nB)));
+      p=start+nB;
+    } else if(rec===999){ I(); done=true; }
+    else throw new Error('Unexpected record type '+rec+' — file may be damaged.');
+  }
+  const real=[]; vars.forEach((v,i)=>{if(!v.isCont) real.push(Object.assign({},v,{dictIndex:i+1}))});
+  const nameMap={};
+  if(longNames) longNames.split('\t').forEach(pr=>{const e=pr.indexOf('=');
+    if(e>0) nameMap[pr.slice(0,e).trim()]=pr.slice(e+1).trim();});
+  real.forEach(v=>v.finalName=nameMap[v.name]||v.name);
+  const valueLabels={},byIdx={}; real.forEach(v=>byIdx[v.dictIndex]=v);
+  rawVL.forEach(set=>{ if(!set.varIndices) return;
+    set.varIndices.forEach(di=>{const v=byIdx[di]; if(!v) return;
+      const m={}; set.labels.forEach(([val,lab])=>m[val]=lab); valueLabels[v.finalName]=m;});});
+  const nTot=vars.length,values=[],dec=new TextDecoder(encoding);
+  if(compression===1){
+    let cl=[],ci=8;
+    const code=()=>{
+      if(ci>=8){
+        if(p+8>buffer.byteLength) return 252;
+        cl=[];for(let i=0;i<8;i++)cl.push(dv.getUint8(p+i));p+=8;ci=0;
+      }
+      return cl[ci++];
+    };
+    let out=[],g=0;
+    while(g++<80000000){
+      const c=code();
+      if(c===252) break;
+      if(c===0) continue;
+      if(c===253){ if(p+8>buffer.byteLength) break; out.push(D()); }
+      else if(c===254) out.push('        ');
+      else if(c===255) out.push(null); else out.push(c-bias);
+      if(out.length===nTot){values.push(out);out=[];}
+    }
+  } else {
+    while(p+nTot*8<=buffer.byteLength){const out=[];for(let i=0;i<nTot;i++)out.push(D());values.push(out);}
+  }
+  let caseWarning=null;
+  if(nCases>0&&values.length!==nCases){
+    caseWarning='The file header declares '+nCases+' cases but '+values.length+' were read.';
+    if(values.length>nCases) values.length=nCases;
+  }
+  const columns={};
+  real.forEach(v=>{
+    const col=new Array(values.length),start=v.dictIndex-1;
+    const nSeg=v.type>0?Math.max(1,Math.ceil(v.type/8)):1;
+    for(let r=0;r<values.length;r++){
+      if(v.type===0){const x=values[r][start];col[r]=(x===null||x===undefined)?null:x;}
+      else{let s='';for(let k=0;k<nSeg;k++){const sg=values[r][start+k];
+        if(typeof sg==='string')s+=sg; else if(sg===null)s+='        ';
+        else if(typeof sg==='number'){const t=new ArrayBuffer(8);new DataView(t).setFloat64(0,sg,little);
+          s+=dec.decode(new Uint8Array(t));}}
+        col[r]=s.replace(/\s+$/,'');}
+    }
+    columns[v.finalName]=col;
+  });
+  const varLabels={},types={},formats={};
+  real.forEach(v=>{varLabels[v.finalName]=v.label;types[v.finalName]=v.type===0?'numeric':'string';formats[v.finalName]=v.printFmt;});
+  const declaredMR=[];
+  mrRaw.forEach(t=>t.split('\n').forEach(line=>{
+    const e=line.indexOf('='); if(e<0) return;
+    const nm=line.slice(0,e).replace(/^\$/,'');
+    const mem=line.slice(e+1).trim().split(/\s+/).filter(x=>columns[x]!==undefined);
+    if(mem.length>1) declaredMR.push({name:nm,members:mem,declared:true});
+  }));
+  return {n:values.length,declaredCases:nCases,caseWarning,product,fileLabel,encoding,names:real.map(v=>v.finalName),
+    types,varLabels,valueLabels,columns,formats,declaredMR,
+    headerWeight:weightIndex>0?(byIdx[weightIndex]||{}).finalName:null};
+}
+
+/* ==== DETECTION ==== */
+function detectWaveVar(f){
+  const pref=['survey','wave','wavenum','svy','survey_wave','surveywave'];
+  for(const p of pref){const hit=f.names.find(n=>n.toLowerCase()===p);
+    if(hit&&f.types[hit]==='numeric'){const u=uniq(f.columns[hit]); if(u.length>1) return hit;}}
+  return null;
+}
+function detectWeightVar(f){
+  if(f.headerWeight) return f.headerWeight;
+  const pref=['weight','wt','wgt','finalweight','weight_final'];
+  for(const p of pref){const hit=f.names.find(n=>n.toLowerCase()===p); if(hit) return hit;}
+  return null;
+}
+function uniq(col){
+  const s=new Set(); col.forEach(v=>{if(v!==null&&v!==undefined&&!Number.isNaN(v))s.add(v)});
+  return [...s].sort((a,b)=>a-b);
+}
+function detectMR(f){
+  if(f.declaredMR.length) return f.declaredMR;
+  const groups={};
+  f.names.forEach(n=>{
+    const m=/^(.*\d)(\d{2})$/.exec(n);
+    if(!m) return;
+    (groups[m[1]]=groups[m[1]]||[]).push({name:n,idx:parseInt(m[2],10)});
+  });
+  const sets=[];
+  Object.keys(groups).forEach(stem=>{
+    const g=groups[stem].sort((a,b)=>a.idx-b.idx);
+    if(g.length<2) return;
+    if(g[0].idx!==1) return;
+    for(let i=0;i<g.length;i++) if(g[i].idx!==i+1) return;
+    const key=n=>JSON.stringify(Object.keys(f.valueLabels[n]||{}).sort());
+    const lab=n=>(f.varLabels[n]||'').trim();
+    const k0=key(g[0].name),l0=lab(g[0].name);
+    if(k0==='[]') return;
+    if(!g.every(x=>key(x.name)===k0&&lab(x.name)===l0)) return;
+    sets.push({name:stem,members:g.map(x=>x.name),declared:false});
+  });
+  return sets;
+}
+
+/* ==== IPF ==== */
+function ipf(rows,cols,targets,pop,maxIter){
+  const n=rows.length,w=new Float64Array(n).fill(1);
+  let iter=0,dev=0;
+  const cap=maxIter||20;
+  for(iter=1;iter<=cap;iter++){
+    dev=0;
+    for(const t of targets){
+      const col=cols[t.varName];
+      for(const c of t.cats){
+        let have=0;
+        for(let i=0;i<n;i++) if(col[rows[i]]===c.code) have+=w[i];
+        const want=pop*c.pct/100;
+        dev=Math.max(dev,Math.abs(have-want)/pop);
+        if(have>0){const f=want/have; for(let i=0;i<n;i++) if(col[rows[i]]===c.code) w[i]*=f;}
+      }
+    }
+    let s=0; for(let i=0;i<n;i++) s+=w[i];
+    const sc=pop/s; for(let i=0;i<n;i++) w[i]*=sc;
+    if(dev<1e-10) break;
+  }
+  return {w,iter,dev,converged:dev<1e-9,cap};
+}
+function diagnose(w){
+  const n=w.length; let s=0; for(let i=0;i<n;i++) s+=w[i];
+  const mean=s/n; let v=0; for(let i=0;i<n;i++) v+=(w[i]-mean)*(w[i]-mean);
+  v/=n; const deff=1+v/(mean*mean);
+  let mn=Infinity,mx=-Infinity; for(let i=0;i<n;i++){if(w[i]<mn)mn=w[i];if(w[i]>mx)mx=w[i];}
+  return {min:mn,max:mx,mean,sd:Math.sqrt(v),deff,ess:n/deff,n};
+}
+
+/* ==== SYNTAX ==== */
+function roundTargets(cats){
+  // keep every typed value as entered where possible; correct the 0.001 gap on one row only
+  const scaled=cats.map(c=>Math.round(c.pct*10*1e6)/1e6);
+  const floors=scaled.map(Math.floor);
+  const out=floors.slice();
+  let rem=1000-floors.reduce((a,b)=>a+b,0);
+  const info=scaled.map((x,i)=>({i,f:x-Math.floor(x),v:x}));
+  if(rem>0){
+    info.sort((a,b)=>b.f-a.f||b.v-a.v);
+    for(let k=0;k<rem;k++) out[info[k%info.length].i]+=1;
+  } else if(rem<0){
+    info.sort((a,b)=>a.f-b.f||b.v-a.v);
+    for(let k=0;k<-rem;k++) out[info[k%info.length].i]-=1;
+  }
+  return out.map(x=>x/1000);
+}
+function fmtProp(x){
+  let s=x.toFixed(3);
+  if(s.startsWith('0.')) s=s.slice(1);
+  else if(s.startsWith('-0.')) s='-'+s.slice(2);
+  return s;
+}
+function stamp(){
+  const d=new Date(), tz='America/Denver';
+  const date=d.toLocaleDateString('en-US',{timeZone:tz,day:'2-digit',month:'short',year:'numeric'});
+  const time=d.toLocaleTimeString('en-US',{timeZone:tz,hour:'numeric',minute:'2-digit',hour12:true});
+  let zone='MT';
+  try{ zone=new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'short'})
+    .formatToParts(d).find(p=>p.type==='timeZoneName').value; }catch(e){}
+  return date+' '+time+' '+zone;
+}
+function buildSyntax(scen,st){
+  const f=st.file,L=[];
+  const wv=st.weightVar||'Weight';
+  const rims=scen.rims;
+  L.push('*******************WEIGHT********************.');
+  L.push('* '+scen.name+'.');
+  const wl=st.waveVar?('  |  '+st.waveLabel(st.currentWave)):'';
+  L.push('* '+st.fileName+'  |  n = '+scen.popTotal+wl+'  |  '+stamp()+'.');
+  L.push('* Generated by Rim Weighting v1.2. Requires the SPSSINC RAKE extension and Advanced Statistics.');
+  L.push('WEIGHT OFF.');
+  rims.forEach((r,i)=>{
+    const live=r.cats.filter(c=>c.pct>0);
+    const rounded=roundTargets(live);
+    const parts=live.map((c,k)=>c.code+' '+fmtProp(rounded[k])).join(' ');
+    L.push((i===0?'SPSSINC RAKE DIM':'  DIM')+(i+1)+' = '+r.varName+' '+parts);
+  });
+  L.push('POPTOTAL='+scen.popTotal+' FINALWEIGHT='+wv);
+  L.push('/OPTIONS ITERATIONS=20 CONVERGENCE=.0001 DELTA=.5 SHOW=NO');
+  L.push('/PLOT HISTOGRAM=YES.');
+  L.push('execute.');
+  L.push('alter type '+wv+' (f19.16).');
+  L.push("variable labels "+wv+" '"+(wv.charAt(0).toUpperCase()+wv.slice(1))+"'.");
+  L.push('execute.');
+  L.push('WEIGHT BY '+wv+'.');
+  L.push('FREQUENCIES VARIABLES='+rims.map(r=>r.varName).join(' '));
+  L.push('  /ORDER=ANALYSIS.');
+  L.push('execute.');
+  return L.join('\n');
+}
+
+/* ==== STATE ==== */
+const MAX_SCENARIOS=5;
+const st={file:null,fileName:'',waveVar:null,weightVar:null,waves:[],currentWave:null,
+  scenarios:[],active:0,showNets:true,query:'',marks:[],markIdx:-1,hidden:new Set(),colOrder:[],
+  waveLabel(c){const vl=this.file.valueLabels[this.waveVar]||{};return vl[c]||('Wave '+c)},
+  rowsFor(wave){const out=[];const col=this.file.columns[this.waveVar];
+    for(let i=0;i<this.file.n;i++) if(!this.waveVar||col[i]===wave) out.push(i);
+    return out;}
+};
+const $=id=>document.getElementById(id);
+
+/* ==== LOAD ==== */
+$('pick').onclick=()=>$('fileinput').click();
+$('fileinput').onchange=e=>{const f=e.target.files[0]; e.target.value=''; if(f) load(f);};
+const drop=$('drop');
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f) load(f)});
+
+function load(file){
+  const err=$('loaderr'); err.classList.add('hide');
+  const rd=new FileReader();
+  rd.onload=async()=>{
+    try{
+      const test=parseSav(rd.result);
+      if(!test.n) throw new Error('The file contains no cases.');
+      if(!(await makeRoomForNewProject())) return;
+      openProject(rd.result,file.name,null); st.projectId=newProjectId(); st.fileSaved=false;
+      announce('opened'); scheduleSave(0);
+    }
+    catch(ex){ err.textContent=ex.message; err.classList.remove('hide'); }
+  };
+  rd.onerror=()=>{err.textContent='Could not read the file.';err.classList.remove('hide')};
+  rd.readAsArrayBuffer(file);
+}
+function openProject(buffer,name,saved){
+  const f=parseSav(buffer);
+  if(!f.n) throw new Error('The file contains no cases.');
+  st.restoring=true;
+  st.rawBytes=buffer; st.caseWarning=f.caseWarning;
+  st.file=f; st.fileName=name;
+  st.waveVar=detectWaveVar(f);
+  st.weightVar=detectWeightVar(f);
+  st.mrSets=detectMR(f);
+  st.mrMembers=new Set(); st.mrSets.forEach(s=>s.members.forEach(m=>st.mrMembers.add(m)));
+  if(st.waveVar){ st.waves=uniq(f.columns[st.waveVar]); st.currentWave=st.waves[st.waves.length-1]; }
+  else { st.waves=[]; st.currentWave=null; }
+  st.scenarios=[]; st.colOrder=[]; st.hidden=new Set();
+  if(saved&&saved.scenarios&&saved.scenarios.length){
+    saved.scenarios.forEach(ss=>{
+      const s=newScenario(ss.id); s.name=ss.name||('Scenario '+ss.id); s.basedOn=ss.basedOn||null;
+      (ss.rims||[]).forEach(sr=>{
+        if(!f.columns[sr.varName]||!isRimCandidate(sr.varName)) return;
+        const r=makeRim(sr.varName);
+        r.cats.forEach(c=>{const m=(sr.cats||[]).find(x=>x.code===c.code); if(m) c.pct=m.pct;});
+        s.rims.push(r);
+      });
+      st.scenarios.push(s);
+    });
+    st.scenarios.sort((a,b)=>a.id-b.id);
+    st.scenarios.forEach(compute);
+    st.active=Math.min(Math.max(0,saved.active|0),st.scenarios.length-1);
+    st.colOrder=Array.isArray(saved.colOrder)?saved.colOrder.slice():[];
+    st.hidden=new Set(saved.hidden||[]);
+    st.showNets=saved.showNets!==false; $('netsbox').checked=st.showNets;
+    if(saved.qfilter) $('qfilter').value=saved.qfilter;
+  } else {
+    st.scenarios=[newScenario(1)]; st.active=0;
+  }
+  renderSummary(); renderScenarios(); renderTopline(); renderSyntax();
+  ['s-summary','s-scen','s-top','s-syntax'].forEach(i=>$(i).classList.remove('hide'));
+  $('s-load').classList.add('hide');
+  $('jump').classList.remove('hide');
+  $('projbar').classList.remove('hide');
+  document.body.classList.add('hasfile');
+  $('fileinfo').textContent=name;
+  st.restoring=false;
+}
+
+/* ==== PROJECTS (IndexedDB, on this computer only) ==== */
+// Each project is stored separately: 'files' holds the .sav bytes (written once),
+// 'projects' holds scenarios, targets and layout (rewritten on every change).
+const DB_NAME='rimweighting', DB_VER=2;
+function db(){
+  return new Promise((res,rej)=>{
+    let r; try{ r=indexedDB.open(DB_NAME,DB_VER); }catch(e){ rej(e); return; }
+    r.onupgradeneeded=ev=>{
+      const d=r.result, tx=r.transaction;
+      if(!d.objectStoreNames.contains('projects')) d.createObjectStore('projects',{keyPath:'id'});
+      if(!d.objectStoreNames.contains('files')) d.createObjectStore('files');
+      // carry the single v1.1 saved project across as the first entry in the new list
+      if(d.objectStoreNames.contains('project')){
+        const g=tx.objectStore('project').get('last');
+        g.onsuccess=()=>{
+          const rec=g.result;
+          if(rec&&rec.bytes&&rec.state){
+            const id=newProjectId();
+            tx.objectStore('files').put(rec.bytes,id);
+            tx.objectStore('projects').put({id,fileName:rec.state.fileName||'project.sav',
+              savedAt:rec.state.savedAt||Date.now(),state:rec.state,meta:null});
+          }
+          d.deleteObjectStore('project');
+        };
+      }
+    };
+    r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); r.onblocked=()=>rej(new Error('blocked'));
+  });
+}
+async function dbOp(stores,mode,fn){
+  const d=await db();
+  return new Promise((res,rej)=>{
+    const tx=d.transaction(stores,mode), req=fn(tx);
+    tx.oncomplete=()=>{ d.close(); res(req&&req.result); };
+    tx.onerror=tx.onabort=()=>{ d.close(); rej(tx.error); };
+  });
+}
+const MAX_SAVED=50;
+// Keeps the 10 most recently saved projects. Asks before removing anything, and never
+// removes a project that is open in another tab.
+async function makeRoomForNewProject(){
+  if(st.persist===false) return true;
+  let list=[];
+  try{ list=await listProjects(); }catch(e){ return true; }
+  const excess=list.length+1-MAX_SAVED;
+  if(excess<=0) return true;
+  await probeOtherTabs();
+  const drop=list.filter(p=>!elsewhere.has(p.id)).slice(-excess);   // oldest first to go
+  if(!drop.length) return true;
+  const names=drop.map(p=>'  \u2022 '+p.fileName+' (last saved '+mtTime(p.savedAt,true)+')').join('\n');
+  if(!confirm('Only your '+MAX_SAVED+' most recent projects are kept.\n\nOpening this file will remove '+
+    (drop.length===1?'this saved project':'these saved projects')+':\n'+names+
+    '\n\nThe original .sav '+(drop.length===1?'file is':'files are')+' not affected. Continue?')) return false;
+  for(const p of drop){ try{ await deleteSaved(p.id); }catch(e){} }
+  return true;
+}
+function newProjectId(){ return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function mtTime(ms,withDate){
+  const d=new Date(ms), tz='America/Denver';
+  const t=d.toLocaleTimeString('en-US',{timeZone:tz,hour:'numeric',minute:'2-digit'});
+  if(!withDate) return t+' MT';
+  return d.toLocaleDateString('en-US',{timeZone:tz,month:'short',day:'numeric'})+' at '+t+' MT';
+}
+function snapshot(){
+  return {version:'1.2', fileName:st.fileName, savedAt:Date.now(),
+    scenarios:st.scenarios.map(s=>({id:s.id,name:s.name,basedOn:s.basedOn||null,
+      rims:s.rims.map(r=>({varName:r.varName,cats:r.cats.map(c=>({code:c.code,pct:c.pct}))}))})),
+    active:st.active, colOrder:st.colOrder.slice(), hidden:[...st.hidden],
+    showNets:st.showNets, qfilter:$('qfilter').value};
+}
+function projectMeta(){
+  const rims=st.scenarios.reduce((a,s)=>a+s.rims.length,0);
+  return {cases:st.file.n, wave:st.waveVar?st.waveLabel(st.currentWave):null,
+    waves:st.waveVar?st.waves.length:1, scenarios:st.scenarios.filter(s=>s.rims.length).length, rims};
+}
+let saveTimer=null;
+function scheduleSave(delay){
+  if(!st.file||st.restoring||st.persist===false||!st.projectId) return;
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(saveNow, delay==null?400:delay);
+}
+function snapKey(s){ const c=Object.assign({},s); delete c.savedAt; return JSON.stringify(c); }
+async function saveNow(){
+  saveTimer=null;
+  if(!st.file||!st.rawBytes||!st.projectId) return;
+  // only save when something that is kept has actually changed
+  const key=snapKey(snapshot());
+  if(st.fileSaved&&key===st.lastSnap) return;
+  const id=st.projectId, now=Date.now();
+  try{
+    const state=snapshot(), meta=projectMeta();
+    await dbOp(['projects','files'],'readwrite',tx=>{
+      if(!st.fileSaved) tx.objectStore('files').put(st.rawBytes,id);
+      const s=tx.objectStore('projects'), g=s.get(id);
+      g.onsuccess=()=>{ const prev=g.result||{};
+        s.put({id,fileName:st.fileName,savedAt:now,state,meta,note:prev.note||''}); };
+      return g;
+    });
+    st.fileSaved=true; st.lastSnap=key;
+    $('savestate').textContent='Last saved '+mtTime(now,true);
+    $('savestate').className='sub';
+    announce('saved');
+  }catch(e){
+    st.persist=false;
+    $('savestate').textContent='Autosave unavailable in this browser — closing the tab will lose this project.';
+    $('savestate').className='sub warn';
+  }
+}
+async function listProjects(){
+  const all=await dbOp(['projects'],'readonly',tx=>tx.objectStore('projects').getAll());
+  return (all||[]).sort((a,b)=>b.savedAt-a.savedAt);
+}
+async function openSaved(id,announceRestore){
+  let rec=null,bytes=null;
+  await dbOp(['projects','files'],'readonly',tx=>{
+    const a=tx.objectStore('projects').get(id); a.onsuccess=()=>rec=a.result;
+    const b=tx.objectStore('files').get(id); b.onsuccess=()=>bytes=b.result;
+    return null;
+  });
+  if(!rec||!bytes) throw new Error('That project could not be found.');
+  openProject(bytes,rec.fileName,rec.state);
+  st.projectId=id; st.fileSaved=true; st.lastSnap=snapKey(snapshot());
+  $('savestate').textContent='Last saved '+mtTime(rec.savedAt,true);
+  if(announceRestore){
+    $('restored').textContent='Reopened your last project, '+rec.fileName+', last saved '+mtTime(rec.savedAt,true)+
+      '. Click New Project/Saved Projects to open a different file or another saved project.';
+    $('restored').classList.remove('hide');
+  }
+  announce('opened');
+}
+async function setNote(id,text){
+  await dbOp(['projects'],'readwrite',tx=>{
+    const s=tx.objectStore('projects'), g=s.get(id);
+    g.onsuccess=()=>{ const r=g.result; if(!r) return; r.note=String(text||'').slice(0,300); s.put(r); };
+    return g;
+  });
+  announce('noted');
+}
+async function deleteSaved(id){
+  await dbOp(['projects','files'],'readwrite',tx=>{
+    tx.objectStore('files').delete(id); return tx.objectStore('projects').delete(id);
+  });
+  announce('deleted');
+}
+
+/* ---- which projects are open in other tabs ---- */
+const chan=('BroadcastChannel' in window)?new BroadcastChannel('rimweighting'):null;
+const elsewhere=new Map();   // projectId -> last heard (ms)
+function announce(kind){ if(chan) try{ chan.postMessage({t:kind,id:st.projectId||null}); }catch(e){} }
+if(chan) chan.onmessage=e=>{
+  const m=e.data||{};
+  if(m.t==='who'){ if(st.projectId) chan.postMessage({t:'here',id:st.projectId}); return; }
+  if(m.t==='here'||m.t==='opened'||m.t==='saved'){ if(m.id) elsewhere.set(m.id,Date.now()); }
+  if(m.t==='closed'&&m.id) elsewhere.delete(m.id);
+  if(!st.file&&(m.t==='opened'||m.t==='closed'||m.t==='deleted'||m.t==='saved'||m.t==='noted')) renderRecent();
+};
+function probeOtherTabs(){
+  return new Promise(res=>{
+    if(!chan){ res(); return; }
+    elsewhere.clear(); chan.postMessage({t:'who'}); setTimeout(res,250);
+  });
+}
+addEventListener('pagehide',()=>{ if(st.projectId) announce('closed'); });
+
+/* ---- start screen ---- */
+function renderResume(list){
+  const box=$('resume'); if(!box) return;
+  // the most recent project that isn't already open in another tab
+  const last=list.find(p=>!elsewhere.has(p.id));
+  if(!last){ box.innerHTML=''; return; }
+  const m=last.meta||{};
+  const det=[m.cases?m.cases+' cases':'', m.wave||'',
+    m.scenarios!=null?(m.scenarios+' scenario'+(m.scenarios===1?'':'s')):''].filter(Boolean).join(' \u00b7 ');
+  box.innerHTML='<div class="resume">'+
+    '<div class="rtext"><p class="rlabel">Continue where you left off</p>'+
+    '<p class="rfile num">'+esc(last.fileName)+'</p>'+
+    '<p class="sub" style="margin:2px 0 0">'+esc(det)+(det?' \u00b7 ':'')+'last saved '+mtTime(last.savedAt,true)+'</p>'+
+    (last.note?'<p class="rnote">'+esc(last.note)+'</p>':'')+'</div>'+
+    '<button class="primary" id="resumebtn">Continue</button></div>';
+  $('resumebtn').onclick=async()=>{
+    try{ await openSaved(last.id,false); }
+    catch(e){ $('loaderr').textContent=e.message; $('loaderr').classList.remove('hide'); }
+  };
+}
+async function renderRecent(){
+  const box=$('recent'); if(!box) return;
+  const ae=document.activeElement;
+  if(ae&&ae.classList&&ae.classList.contains('noteinp')){ st.recentStale=true; return; }
+  if(st.persist===false){
+    box.innerHTML='<p class="note warn">This browser will not let the tool save projects, so nothing will be kept after you close the tab.</p>';
+    return;
+  }
+  let list=[];
+  try{ list=await listProjects(); }catch(e){ st.persist=false; renderRecent(); return; }
+  renderResume(list);
+  if(!list.length){ box.innerHTML=''; return; }
+  let h='<h2 style="margin:26px 0 4px">Saved Projects</h2>'+
+    '<p class="sub" style="margin:0 0 10px">Your '+MAX_SAVED+' most recently saved projects are kept.</p>'+
+    '<div class="panel" style="padding:0">'+
+    '<table class="recent"><tr><th>File</th><th>Details</th><th>Last Saved</th><th>Project Notes</th><th></th></tr>';
+  list.forEach(p=>{
+    const m=p.meta||{}, busy=elsewhere.has(p.id);
+    const det=[m.cases?m.cases+' cases':'', m.wave?m.wave:'',
+      m.scenarios!=null?(m.scenarios+' scenario'+(m.scenarios===1?'':'s')):''].filter(Boolean).join(' · ');
+    h+='<tr><td class="num">'+esc(p.fileName)+'</td>'+
+      '<td class="muted">'+esc(det)+'</td>'+
+      '<td class="muted">'+mtTime(p.savedAt,true)+'</td>'+
+      '<td><textarea class="noteinp" data-note="'+p.id+'" maxlength="300" rows="1" '+
+      'placeholder="Add a note\u2026" aria-label="Project notes for '+esc(p.fileName)+'">'+esc(p.note||'')+
+      '</textarea></td><td class="r" style="white-space:nowrap">'+
+      (busy?'<span class="muted" style="margin-right:10px">Open in another tab</span>'
+           :'<button class="mini primary" data-open="'+p.id+'">Open</button> ')+
+      '<button class="mini" data-del="'+p.id+'"'+(busy?' disabled':'')+'>Delete</button></td></tr>';
+  });
+  h+='</table></div>';
+  box.innerHTML=h;
+  const fit=el=>{ el.style.height='auto'; el.style.height=el.scrollHeight+2+'px'; };
+  box.querySelectorAll('.noteinp').forEach(inp=>{
+    fit(inp);
+    inp.addEventListener('input',()=>fit(inp));
+    let t=null;
+    const commit=()=>{ clearTimeout(t); t=null; setNote(inp.dataset.note,inp.value.trim()).catch(()=>{}); };
+    inp.addEventListener('input',()=>{ clearTimeout(t); t=setTimeout(commit,500); });
+    inp.addEventListener('blur',()=>{ commit(); if(st.recentStale){ st.recentStale=false; setTimeout(renderRecent,0); } });
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); inp.blur(); } });
+  });
+  box.querySelectorAll('[data-open]').forEach(b=>b.onclick=async()=>{
+    try{ await openSaved(b.dataset.open,false); }
+    catch(e){ $('loaderr').textContent=e.message; $('loaderr').classList.remove('hide'); }
+  });
+  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
+    const row=list.find(x=>x.id===b.dataset.del);
+    if(!confirm('Delete the saved project for '+row.fileName+'?\n\nIts scenarios and targets cannot be recovered. '+
+      'The original .sav file on your computer is not affected.')) return;
+    await deleteSaved(row.id); renderRecent();
+  });
+}
+async function startup(){
+  // The tool always opens on the start screen. The most recent project is offered
+  // at the top as "Continue where you left off".
+  if(location.hash==='#start'){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+  try{ await listProjects(); }catch(e){ st.persist=false; renderRecent(); return; }
+  await probeOtherTabs();
+  renderRecent();
+}
+async function newProject(){
+  if(saveTimer){ clearTimeout(saveTimer); await saveNow(); }
+  announce('closed');
+  location.hash='start';
+  location.reload();
+}
+
+function currentRows(){ return st.waveVar? st.rowsFor(st.currentWave) : [...Array(st.file.n).keys()]; }
+function newScenario(i){ return {id:i,name:'Scenario '+i,rims:[],weights:null,diag:null,popTotal:currentPop()}; }
+function nextScenarioId(){
+  for(let i=1;i<=MAX_SCENARIOS;i++) if(!st.scenarios.some(s=>s.id===i)) return i;
+  return null;
+}
+function createScenario(id){
+  const s=newScenario(id);
+  st.scenarios.push(s);
+  st.scenarios.sort((a,b)=>a.id-b.id);
+  return s;
+}
+function cloneRims(src){
+  return src.rims.map(r=>({varName:r.varName,
+    cats:r.cats.map(c=>({code:c.code,label:c.label,n:c.n,pct:c.pct}))}));
+}
+function copyInto(dest,src){
+  dest.rims=cloneRims(src);
+  dest.basedOn=src.name;
+  compute(dest); renderScenarios(); renderTopline(); renderSyntax();
+}
+function currentPop(){ return st.file? currentRows().length : 0; }
+
+/* ==== SUMMARY ==== */
+function renderSummary(){
+  const f=st.file, rows=currentRows();
+  const facts=[['Cases',f.n],['Variables',f.names.length],
+    ['Waves',st.waveVar?st.waves.length:'none detected'],
+    ['Current wave',st.waveVar?st.waveLabel(st.currentWave)+' (n='+rows.length+')':'all '+f.n+' cases'],
+    ['Weight variable',st.weightVar||'not present'],
+    ['Multiple response sets',st.mrSets.length]];
+  $('facts').innerHTML=facts.map(([k,v])=>
+    '<div class="fact"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>').join('');
+
+  let h='';
+  if(st.waveVar){
+    const wcol=st.weightVar?f.columns[st.weightVar]:null;
+    h+='<table><tr><th>Wave</th><th class="r">n</th><th>Weight in file</th><th class="r">Effective n</th></tr>';
+    st.waves.forEach(c=>{
+      const rr=st.rowsFor(c);
+      let desc='<span class="muted">no weight variable</span>',ess=rr.length;
+      if(wcol){
+        const w=rr.map(i=>wcol[i]).filter(x=>x!==null);
+        if(w.length!==rr.length) desc='<span class="bad">'+(rr.length-w.length)+' cases missing a weight</span>';
+        else if(w.every(x=>Math.abs(x-1)<1e-12)) desc='all 1.000 — placeholder';
+        else { const d=diagnose(Float64Array.from(w));
+          desc='stored, '+d.min.toFixed(3)+'–'+d.max.toFixed(3)+', deff '+d.deff.toFixed(3);
+          ess=d.ess; }
+      }
+      const cur=c===st.currentWave;
+      h+='<tr><td>'+st.waveLabel(c)+(cur?' <span class="tag rim">current</span>':'')+
+        '</td><td class="r num">'+rr.length+'</td><td>'+desc+'</td><td class="r num">'+Math.round(ess)+'</td></tr>';
+    });
+    h+='</table>';
+    const wcol2=st.weightVar?f.columns[st.weightVar]:null;
+    if(wcol2){
+      const cw=currentRows().map(i=>wcol2[i]);
+      if(!cw.every(x=>x!==null&&Math.abs(x-1)<1e-12))
+        h+='<p class="note warn" style="margin-top:12px">The current wave already has weights that are not all 1.000. Running the generated syntax will overwrite them.</p>';
+    }
+  } else {
+    h+='<p class="note info">No wave variable found, so the whole file is treated as one wave.</p>';
+  }
+  if(st.caseWarning) h+='<p class="note bad" style="margin-top:12px">'+st.caseWarning+' Check this file in SPSS before trusting these numbers.</p>';
+  const drift=driftVars();
+  if(drift.length) h+='<p class="note warn" style="margin-top:12px">Codeframe drift in '+
+    drift.slice(0,8).map(v=>'<b>'+v+'</b>').join(', ')+(drift.length>8?' and '+(drift.length-8)+' more':'')+
+    ': codes appear in one wave but never another. A .sav stores one label set per variable, so older waves may display against newer labels.</p>';
+  $('wavebox').innerHTML=h;
+}
+function driftVars(){
+  if(!st.waveVar||st.waves.length<2) return [];
+  const f=st.file,out=[];
+  f.names.forEach(v=>{
+    if(v===st.waveVar||v===st.weightVar||f.types[v]!=='numeric') return;
+    const sets=st.waves.map(c=>new Set(st.rowsFor(c).map(i=>f.columns[v][i]).filter(x=>x!==null)));
+    if(sets.some(s=>s.size===0)) return;
+    const all=new Set(); sets.forEach(s=>s.forEach(x=>all.add(x)));
+    for(const x of all) if(!sets.every(s=>s.has(x))){out.push(v);break;}
+  });
+  return out;
+}
+
+/* ==== SCENARIOS ==== */
+function isRimCandidate(v){
+  const f=st.file; if(!f) return false;
+  if(v===st.waveVar||v===st.weightVar) return false;
+  if(f.types[v]!=='numeric') return false;
+  if(st.mrMembers.has(v)) return false;
+  const vl=f.valueLabels[v];
+  return !!vl&&Object.keys(vl).length>=2&&Object.keys(vl).length<=30;
+}
+function addWeightHTML(v){
+  if(!isRimCandidate(v)) return '';
+  return '<button class="mini addwt" data-addvar="'+v+'">Add weight</button>';
+}
+function wireAddWeight(){
+  document.querySelectorAll('[data-addvar]').forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const v=b.dataset.addvar;
+    document.querySelectorAll('.scenmenu').forEach(m=>m.remove());
+    const m=document.createElement('div');
+    m.className='scenmenu';
+    let items='';
+    for(let id=1;id<=MAX_SCENARIOS;id++){
+      const s=st.scenarios.find(x=>x.id===id);
+      if(s){
+        const has=s.rims.some(r=>r.varName===v), full=s.rims.length>=10;
+        items+='<button class="mitem" data-id="'+id+'"'+((has||full)?' disabled':'')+'>'+
+          esc(s.name)+(has?' <span class="muted">already added</span>':
+            full?' <span class="muted">10 rims max</span>':
+            ' <span class="muted">'+s.rims.length+' rim'+(s.rims.length===1?'':'s')+'</span>')+'</button>';
+      } else {
+        items+='<button class="mitem" data-id="'+id+'" data-new="1">Scenario '+id+
+          ' <span class="muted">new</span></button>';
+      }
+    }
+    m.innerHTML='<p class="mhead">Add to which scenario?</p>'+items+
+      '<button class="mitem cancel">Cancel</button>';
+    b.parentNode.appendChild(m);
+    m.querySelectorAll('[data-id]').forEach(x=>{ if(!x.disabled)
+      x.onclick=()=>{
+        const id=+x.dataset.id;
+        const s=st.scenarios.find(y=>y.id===id)||createScenario(id);
+        addRimTo(s,v);
+      }; });
+    m.querySelector('.cancel').onclick=()=>m.remove();
+  });
+}
+function addRimTo(s,v){
+  document.querySelectorAll('.scenmenu').forEach(m=>m.remove());
+  if(s.rims.some(r=>r.varName===v)||s.rims.length>=10) return;
+  addRim(s,v);
+  st.justAdded={v:v,name:s.name};
+  st.active=st.scenarios.indexOf(s);
+  renderScenarios(); renderTopline(); renderSyntax();
+}
+addEventListener('click',e=>{ if(!e.target.closest('.scenmenu')&&!e.target.closest('[data-addvar]'))
+  document.querySelectorAll('.scenmenu').forEach(m=>m.remove()); });
+function renderScenarios(){
+  const chips=st.scenarios.map((s,i)=>
+    '<div class="chip" role="tab" aria-selected="'+(i===st.active)+'" data-i="'+i+'">'+s.name+
+    (s.diag?' <span class="num">· deff '+s.diag.deff.toFixed(2)+'</span>':'')+'</div>').join('')+
+    (st.scenarios.length<MAX_SCENARIOS?'<button class="chip" id="addscen">+ Add scenario</button>':'');
+  $('scenchips').innerHTML=chips;
+  $('scenchips').querySelectorAll('.chip[data-i]').forEach(c=>
+    c.onclick=()=>{st.active=+c.dataset.i;renderScenarios();renderSyntax();});
+  if($('addscen')) $('addscen').onclick=()=>{
+    const id=nextScenarioId(); if(id===null) return;
+    const ns=createScenario(id);
+    st.active=st.scenarios.indexOf(ns); renderScenarios(); renderSyntax();};
+
+  const s=st.scenarios[st.active],f=st.file,rows=currentRows();
+  const used=new Set(s.rims.map(r=>r.varName));
+  const cands=f.names.filter(isRimCandidate);
+  let h='<div class="controls"><label for="addrim">Add rim variable</label><select id="addrim" style="flex:1;min-width:280px;max-width:640px">'+
+    '<option value="">Select a variable…</option>'+
+    cands.map(v=>'<option value="'+v+'"'+(used.has(v)?' disabled':'')+'>'+esc(f.varLabels[v]||v)+'</option>').join('')+
+    '</select>'+
+    (s.rims.length&&st.scenarios.length<MAX_SCENARIOS?'<button class="mini" id="dupscen">Duplicate to new scenario</button>':'')+
+    (s.rims.length?'<button class="mini" id="clearrims">Clear all</button>':'')+'</div>';
+  if(!s.rims.length){
+    const donors=st.scenarios.filter((x,i)=>i!==st.active&&x.rims.length);
+    h+='<p class="note info">Pick a variable above to start building this scheme. Up to 10 rims.</p>';
+    if(donors.length) h+='<div class="controls" style="margin-top:-4px"><label>Or start from a copy</label>'+
+      donors.map(d=>'<button class="mini" data-copy="'+st.scenarios.indexOf(d)+'">'+d.name+
+        ' <span class="muted">('+d.rims.length+' rim'+(d.rims.length===1?'':'s')+')</span></button>').join('')+'</div>';
+  }
+  s.rims.forEach((r,ri)=>{ h+=rimHTML(r,ri,rows); });
+  if(s.rims.length){
+    const v=validate(s);
+    if(v.errors.length) h+='<p class="note bad">'+v.errors.join('<br>')+'</p>';
+    if(s.basedOn) h+='<p class="sub" style="margin:-4px 0 12px">Copied from '+s.basedOn+'. Edits here do not affect it.</p>';
+    if(s.diag) h+=diagHTML(s);
+    else if(!v.errors.length) h+='<p class="note info">Targets are valid. Weights update as you type.</p>';
+  }
+  $('scenbody').innerHTML=h;
+  fitLabelCol($('scenbody'),'--labelw',13,false,190,430,26);
+  { const sb=$('scenbody'),rs=sb.querySelector('.rimscroll');
+    const nh=Math.max(0,...[...sb.querySelectorAll('.rim table')].map(t=>t.querySelectorAll('col.r-hist').length));
+    const lw=parseFloat(sb.style.getPropertyValue('--labelw'))||190;
+    if(rs) sb.style.setProperty('--histw',fitDataCol(rs.clientWidth-8,52+lw+126+104+96,nh,90,112)+'px');
+    pinTables(sb); }
+  $('addrim').onchange=e=>{ if(e.target.value){ addRim(s,e.target.value); } };
+  if($('clearrims')) $('clearrims').onclick=()=>{s.rims=[];s.basedOn=null;compute(s);renderScenarios();renderTopline();renderSyntax();};
+  if($('dupscen')) $('dupscen').onclick=()=>{
+    const id=nextScenarioId(); if(id===null) return;
+    const n=createScenario(id); st.active=st.scenarios.indexOf(n);
+    copyInto(n,s);
+  };
+  $('scenbody').querySelectorAll('button[data-copy]').forEach(b=>
+    b.onclick=()=>copyInto(s,st.scenarios[+b.dataset.copy]));
+  $('scenbody').querySelectorAll('input[data-rim]').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+      const r=s.rims[+inp.dataset.rim];
+      r.cats[+inp.dataset.cat].pct=parseFloat(inp.value)||0;
+      updateRimTotals(s); compute(s); renderTopline(); renderSyntax(); refreshChips();
+    });
+  });
+  $('scenbody').querySelectorAll('button[data-remove]').forEach(b=>
+    b.onclick=()=>{s.rims.splice(+b.dataset.remove,1);compute(s);renderScenarios();renderTopline();renderSyntax();});
+}
+function refreshChips(){
+  st.scenarios.forEach((s,i)=>{
+    const c=$('scenchips').querySelector('.chip[data-i="'+i+'"]');
+    if(c) c.innerHTML=s.name+(s.diag?' <span class="num">· deff '+s.diag.deff.toFixed(2)+'</span>':'');
+  });
+}
+function makeRim(v){
+  const f=st.file,rows=currentRows(),col=f.columns[v],vl=f.valueLabels[v]||{};
+  const codes=Object.keys(vl).map(Number).sort((a,b)=>a-b);
+  const counts={}; codes.forEach(c=>counts[c]=0);
+  let valid=0;
+  rows.forEach(i=>{const x=col[i]; if(x!==null&&counts[x]!==undefined){counts[x]++;valid++;}});
+  return {varName:v,cats:codes.map(c=>({code:c,label:vl[c],n:counts[c],pct:valid?100*counts[c]/valid:0}))};
+}
+function addRim(s,v){
+  if(s.rims.length>=10) return;
+  s.rims.push(makeRim(v));
+  s.popTotal=currentRows().length;
+  compute(s); renderScenarios(); renderTopline(); renderSyntax();
+}
+function rimOK(tot){ return Math.abs(Math.round(tot*10)/10-100)<0.1000001; }
+function fmtDiff(d){
+  if(Math.abs(d)<0.05) return '<span class="muted">\u2014</span>';
+  return (d>0?'+':'\u2212')+Math.abs(d).toFixed(1);
+}
+function rimColumns(){
+  // same order as the topline: scenario columns are left out (this table IS a scenario),
+  // hidden waves are left out, and the current-wave column is always kept
+  return syncOrder(allColumns()).filter(c=>c.key==='cur-u'||(c.hist&&!st.hidden.has(c.key)));
+}
+function rimHTML(r,ri,rows){
+  const f=st.file,tot=r.cats.reduce((a,c)=>a+c.pct,0),ok=rimOK(tot);
+  const seq=rimColumns();
+  let h='<div class="rim"><header><div><h3>'+esc(f.varLabels[r.varName]||r.varName)+'</h3>'+
+    '<div class="vn num">'+r.varName+'</div></div>'+
+    '<button class="mini" data-remove="'+ri+'" aria-label="Remove rim">Remove</button></header>'+
+    '<div class="rimscroll"><table><colgroup><col class="r-code"><col class="r-label">'+
+    seq.map(c=>c.key==='cur-u'?'<col class="r-cur"><col class="r-target"><col class="r-diff">'
+      :'<col class="r-hist">').join('')+'</colgroup>'+
+    '<tr><th>Code</th><th>Value label</th>'+
+    seq.map(c=> c.key==='cur-u'
+      ? '<th class="r">'+esc(c.label)+'</th>'+
+        '<th class="r">Target %</th><th class="r">Difference</th>'
+      : '<th class="r hist">'+esc(c.label)+
+        (c.note?'<br><span class="hnote">'+c.note+'</span>':'')+'</th>').join('')+'</tr>';
+  r.cats.forEach((c,ci)=>{
+    const samp=rows.length?100*c.n/rows.length:0;
+    const ratio=c.n?(c.pct/100*rows.length)/c.n:null;
+    const cls=(ratio!==null&&(ratio<0.5||ratio>2))?'warn':'muted';
+    h+='<tr><td class="num muted">'+c.code+'</td><td>'+esc(c.label)+'</td>'+
+      seq.map(col=>{
+        if(col.key==='cur-u') return '<td class="r num muted">'+c.n+' · '+samp.toFixed(1)+'%</td>'+
+          '<td class="r"><input type="number" step="0.1" min="0" style="width:88px" value="'+c.pct.toFixed(1)+
+          '" data-rim="'+ri+'" data-cat="'+ci+'"></td>'+
+          '<td class="r num '+cls+'" data-ratio="'+ri+'-'+ci+'" title="'+
+          (ratio===null?'no cases in this category':'weight factor '+ratio.toFixed(2))+'">'+
+          fmtDiff(c.pct-samp)+'</td>';
+        const p=pct(r.varName,c.code,col);
+        return '<td class="r num hist">'+(p===null?'<span class="muted">not asked</span>':p.toFixed(1)+'%')+'</td>';
+      }).join('')+'</tr>';
+  });
+  h+='<tr class="total"><td></td><td>Total</td>'+
+    seq.map(col=> col.key==='cur-u'
+      ? '<td></td><td class="r num '+(ok?'ok':'bad')+'" data-total="'+ri+'">'+tot.toFixed(1)+'%</td>'+
+        '<td class="r num bad" data-off="'+ri+'">'+(ok?'':fmtDiff(tot-100))+'</td>'
+      : '<td></td>').join('')+'</tr></table></div></div>';
+  return h;
+}
+function updateRimTotals(s){
+  const rows=currentRows();
+  s.rims.forEach((r,ri)=>{
+    const tot=r.cats.reduce((a,c)=>a+c.pct,0),ok=rimOK(tot);
+    const tEl=document.querySelector('[data-total="'+ri+'"]');
+    if(tEl){tEl.textContent=tot.toFixed(1)+'%';tEl.className='r num '+(ok?'ok':'bad');}
+    const oEl=document.querySelector('[data-off="'+ri+'"]');
+    if(oEl) oEl.innerHTML=ok?'':fmtDiff(tot-100);
+    r.cats.forEach((c,ci)=>{
+      const el=document.querySelector('[data-ratio="'+ri+'-'+ci+'"]');
+      if(!el) return;
+      const samp=rows.length?100*c.n/rows.length:0;
+      const ratio=c.n?(c.pct/100*rows.length)/c.n:null;
+      el.innerHTML=fmtDiff(c.pct-samp);
+      el.title=ratio===null?'no cases in this category':'weight factor '+ratio.toFixed(2);
+      el.className='r num '+((ratio!==null&&(ratio<0.5||ratio>2))?'warn':'muted');
+    });
+  });
+}
+function validate(s){
+  const errors=[],warnings=[],rows=currentRows();
+  s.rims.forEach(r=>{
+    const tot=r.cats.reduce((a,c)=>a+c.pct,0);
+    if(!rimOK(tot)) errors.push('<b>'+r.varName+'</b> targets total '+tot.toFixed(1)+
+      '%. Totals of 99.9%, 100.0% and 100.1% are accepted.');
+    r.cats.forEach(c=>{ if(c.n===0&&c.pct>0)
+      errors.push('<b>'+r.varName+'</b> code '+c.code+' ('+esc(c.label)+') has a target but no cases. SPSSINC RAKE will stop on an empty cell.'); });
+    const col=st.file.columns[r.varName];
+    const miss=rows.filter(i=>col[i]===null).length;
+    if(miss) warnings.push(miss+' cases are missing on '+r.varName+' and will be excluded.');
+    r.cats.forEach(c=>{ if(c.n>0){ const ratio=(c.pct/100*rows.length)/c.n;
+      if(ratio<0.5||ratio>2) warnings.push('<b>'+r.varName+'</b> code '+c.code+' ('+esc(c.label)+
+        ') is weighted by a factor of '+ratio.toFixed(2)+' — '+c.n+' cases carrying the weight of '+
+        Math.round(c.pct/100*rows.length)+'.'); } });
+  });
+  return {errors,warnings};
+}
+function compute(s){
+  const rows=currentRows();
+  s.popTotal=rows.length;
+  const v=validate(s);
+  if(!s.rims.length||v.errors.length){ s.weights=null; s.diag=null; return; }
+  const targets=s.rims.map(r=>({varName:r.varName,cats:r.cats}));
+  const res=ipf(rows,st.file.columns,targets,rows.length,20);
+  s.weights=res.w; s.iter=res.iter; s.dev=res.dev; s.converged=res.converged;
+  s.rowIndex=rows;
+  s.diag=diagnose(res.w);
+}
+function diagHTML(s){
+  const d=s.diag,v=validate(s);
+  let h='<div class="diag">'+
+    [['Weights',d.min.toFixed(3)+' – '+d.max.toFixed(3)],['Std deviation',d.sd.toFixed(3)],
+     ['Design effect',d.deff.toFixed(3)],['Effective n',Math.round(d.ess)+' of '+d.n],
+     ['Base loss',(100*(1-1/d.deff)).toFixed(1)+'%'],
+     ['Iterations',s.iter+(s.converged?'':' of 20')]]
+    .map(([k,val])=>'<div><div class="k">'+k+'</div><div class="v num">'+val+'</div></div>').join('')+'</div>';
+  const notes=v.warnings.slice();
+  if(!s.converged) notes.unshift('Targets were not fully met after 20 iterations — the largest gap is '+
+    (s.dev*100).toFixed(4)+' percentage points. SPSS stops at the same 20-iteration limit, so its weights will land in the same place. Raise ITERATIONS in the syntax if you need it tighter.');
+  if(notes.length) h+='<p class="note warn" style="margin-top:12px">'+notes.join('<br>')+'</p>';
+  return h;
+}
+
+/* ==== COMBINED CATEGORIES (NETS) ==== */
+const INTENSITY=[
+  'very','somewhat','definitely','probably','strongly','mostly','slightly','extremely',
+  'lean','leaning','moderately','certainly','absolutely','totally','completely','fairly',
+  'certain','likely','definite','probable','hard','soft','solid','firm','strong','weak',
+  'mildly','quite','highly','only','just',
+  'lean toward','lean towards','leaning toward','leaning towards','lean to','leaning to',
+  'very strongly','not very','not at all','a little'
+].sort((a,b)=>b.length-a.length);
+function stripIntensity(raw){
+  const low=raw.toLowerCase();
+  for(const p of INTENSITY){
+    if(low.startsWith(p+' ')) return raw.slice(p.length+1).trim();
+  }
+  return null;
+}
+function netsFor(v){
+  const vl=st.file.valueLabels[v]; if(!vl) return [];
+  const codes=Object.keys(vl).map(Number).sort((a,b)=>a-b);
+  const groups={};
+  codes.forEach(c=>{
+    const raw=String(vl[c]||'').trim();
+    let stem=stripIntensity(raw);
+    if(stem===null) return;
+    stem=stem.replace(/\s*\((?:DNR|dnr)\)\s*$/,'').trim();
+    if(!stem) return;
+    const key=stem.toLowerCase();
+    if(!groups[key]) groups[key]={label:stem,codes:[],first:c};
+    groups[key].codes.push(c);
+  });
+  return Object.keys(groups).map(k=>groups[k])
+    .filter(g=>g.codes.length>1)
+    .sort((a,b)=>a.first-b.first);
+}
+function netLabel(g){
+  const s=g.label;
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+
+/* ==== TOPLINE ==== */
+function allColumns(){
+  const f=st.file,cols=[];
+  // current wave first, then its scenarios, then historical waves newest to oldest
+  const cr=currentRows();
+  cols.push({key:'cur-u',label:st.waveVar?st.waveLabel(st.currentWave)+' unweighted':'Unweighted',
+    short:'Unweighted',rows:cr,w:Float64Array.from(cr.map(()=>1)),note:'',current:true});
+  st.scenarios.forEach(s=>{ if(s.weights)
+    cols.push({key:'s'+s.id,label:(st.waveVar?st.waveLabel(st.currentWave)+' · ':'')+s.name,
+      short:s.name,rows:s.rowIndex,w:s.weights,note:'deff '+s.diag.deff.toFixed(2),
+      current:true,scen:s}); });
+  if(st.waveVar){
+    st.waves.filter(c=>c!==st.currentWave).sort((a,b)=>b-a).forEach(c=>{
+      const rows=st.rowsFor(c);
+      const wcol=st.weightVar?f.columns[st.weightVar]:null;
+      const w=Float64Array.from(rows.map(i=>wcol?(wcol[i]===null?1:wcol[i]):1));
+      const flat=!wcol||w.every(x=>Math.abs(x-1)<1e-12);
+      cols.push({key:'w'+c,label:st.waveLabel(c),short:st.waveLabel(c),rows,w,
+        note:flat?'unweighted':'stored weight',hist:true});
+    });
+  }
+  return cols;
+}
+function syncOrder(all){
+  const keys=all.map(c=>c.key);
+  st.colOrder=st.colOrder.filter(k=>keys.indexOf(k)>=0);
+  keys.forEach((k,i)=>{
+    if(st.colOrder.indexOf(k)>=0) return;
+    let pos=st.colOrder.length;
+    for(let j=i-1;j>=0;j--){ const p=st.colOrder.indexOf(keys[j]); if(p>=0){ pos=p+1; break; } }
+    st.colOrder.splice(pos,0,k);
+  });
+  return st.colOrder.map(k=>all.find(c=>c.key===k)).filter(Boolean);
+}
+function naturalOrder(all){ return all.map(c=>c.key).join('|')===st.colOrder.join('|'); }
+function toplineColumns(){
+  const all=syncOrder(allColumns());
+  const vis=all.filter(c=>!st.hidden.has(c.key));
+  return vis.length?vis:all;
+}
+function renderColPicker(){
+  const raw=allColumns(),box=$('colpicker');
+  if(!raw.length){ box.innerHTML=''; box.style.display='none'; return; }
+  const all=syncOrder(raw);
+  box.style.display='flex';
+  const vis=all.filter(c=>!st.hidden.has(c.key)).length;
+  let h='<span class="lbl">Columns'+(all.length>1?' <span class="hint">drag to reorder</span>':'')+'</span>';
+  all.forEach(c=>{
+    const on=!st.hidden.has(c.key);
+    h+='<span class="colchip'+(on?'':' off')+'" draggable="true" data-col="'+c.key+'" tabindex="0">'+
+       '<span class="grip" aria-hidden="true">\u22EE\u22EE</span>'+esc(c.short||c.label)+
+       '<button class="eye" data-toggle="'+c.key+'" aria-label="'+(on?'Hide':'Show')+' column">'+
+       (on?'\u2013':'+')+'</button></span>';
+  });
+  h+='<span class="lbl" style="margin-left:4px">'+vis+' of '+all.length+' shown</span>';
+  if(!naturalOrder(raw)) h+='<button class="mini" id="resetorder" style="margin-left:2px">Reset order</button>';
+  box.innerHTML=h;
+
+  box.querySelectorAll('[data-toggle]').forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const k=b.dataset.toggle;
+    if(!st.hidden.has(k)&&all.filter(c=>!st.hidden.has(c.key)).length===1) return;
+    if(st.hidden.has(k)) st.hidden.delete(k); else st.hidden.add(k);
+    refreshColumns();
+  });
+  if($('resetorder')) $('resetorder').onclick=()=>{ st.colOrder=[]; refreshColumns(); };
+
+  let dragKey=null;
+  box.querySelectorAll('.colchip').forEach(chip=>{
+    chip.addEventListener('dragstart',e=>{
+      dragKey=chip.dataset.col; chip.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      try{ e.dataTransfer.setData('text/plain',dragKey); }catch(_){}
+    });
+    chip.addEventListener('dragend',()=>{
+      dragKey=null; box.querySelectorAll('.colchip').forEach(c=>c.classList.remove('dragging','over'));
+    });
+    chip.addEventListener('dragover',e=>{
+      e.preventDefault(); e.dataTransfer.dropEffect='move';
+      if(chip.dataset.col!==dragKey) chip.classList.add('over');
+    });
+    chip.addEventListener('dragleave',()=>chip.classList.remove('over'));
+    chip.addEventListener('drop',e=>{
+      e.preventDefault(); chip.classList.remove('over');
+      const from=dragKey||e.dataTransfer.getData('text/plain'), to=chip.dataset.col;
+      if(!from||from===to) return;
+      moveColumn(from,to);
+    });
+    chip.addEventListener('keydown',e=>{
+      if(!e.altKey) return;
+      const i=st.colOrder.indexOf(chip.dataset.col);
+      if(e.key==='ArrowLeft'&&i>0){ e.preventDefault(); swapCols(i,i-1); }
+      if(e.key==='ArrowRight'&&i<st.colOrder.length-1){ e.preventDefault(); swapCols(i,i+1); }
+    });
+  });
+}
+function moveColumn(from,to){
+  const o=st.colOrder.slice();
+  const fi=o.indexOf(from); if(fi<0) return;
+  o.splice(fi,1);
+  const ti=o.indexOf(to); if(ti<0) return;
+  o.splice(ti,0,from);
+  st.colOrder=o; refreshColumns();
+}
+function refreshColumns(){ renderScenarios(); renderTopline(); }
+function swapCols(a,b){
+  const o=st.colOrder.slice(); const t=o[a]; o[a]=o[b]; o[b]=t;
+  st.colOrder=o; refreshColumns();
+  setTimeout(()=>{const el=document.querySelector('[data-col="'+t+'"]'); if(el) el.focus();},0);
+}
+function pct(v,code,col){ return pctSet(v,[code],col); }
+function pctSet(v,codes,col){
+  const c=st.file.columns[v]; let num=0,den=0;
+  for(let k=0;k<col.rows.length;k++){const i=col.rows[k];
+    if(c[i]===null) continue; den+=col.w[k]; if(codes.indexOf(c[i])>=0) num+=col.w[k];}
+  return den?100*num/den:null;
+}
+function haystack(v){
+  const f=st.file;
+  if(!f._hay) f._hay={};
+  if(f._hay[v]) return f._hay[v];
+  const vl=f.valueLabels[v]||{};
+  const s=(v+' '+(f.varLabels[v]||'')+' '+Object.keys(vl).map(k=>vl[k]).join(' ')).toLowerCase();
+  f._hay[v]=s; return s;
+}
+function matches(v){
+  if(!st.query) return true;
+  const hay=haystack(v);
+  return st.query.split(/\s+/).filter(Boolean).every(t=>hay.indexOf(t)>=0);
+}
+function hl(text){
+  const safe=esc(text);
+  if(!st.query) return safe;
+  const terms=st.query.split(/\s+/).filter(Boolean)
+    .map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).sort((a,b)=>b.length-a.length);
+  if(!terms.length) return safe;
+  return safe.replace(new RegExp('('+terms.join('|')+')','gi'),'<mark>$1</mark>');
+}
+function numericBlock(v,cols){
+  const f=st.file,c=f.columns[v];
+  const stat=col=>{
+    let n=0,sw=0,swx=0,mn=Infinity,mx=-Infinity;
+    for(let k=0;k<col.rows.length;k++){const i=col.rows[k],x=c[i];
+      if(x===null) continue; n++; sw+=col.w[k]; swx+=col.w[k]*x;
+      if(x<mn)mn=x; if(x>mx)mx=x;}
+    return n?{n,mean:swx/sw,min:mn,max:mx}:null;
+  };
+  const s=cols.map(stat);
+  const row=(label,get)=>'<tr><td></td><td>'+label+'</td>'+
+    s.map(x=>'<td class="r num">'+(x?get(x):'<span class="muted">not asked</span>')+'</td>').join('')+'</tr>';
+  return '<div class="qblock"><p class="qh">'+hl(f.varLabels[v]||v)+
+    '<span class="tag mr">continuous</span></p><p class="qm num">'+hl(v)+
+    ' · no value labels, so summary statistics are shown</p><table>'+colGroup(cols.length)+
+    '<tr><th>Code</th><th>Statistic</th>'+cols.map(x=>'<th class="r">'+thLabel(x)+'</th>').join('')+'</tr>'+
+    row('Mean',x=>x.mean.toFixed(2))+row('Minimum',x=>x.min)+row('Maximum',x=>x.max)+
+    '<tr class="total"><td></td><td class="muted">Base</td>'+
+    s.map(x=>'<td class="r num muted">'+(x?x.n:'—')+'</td>').join('')+'</tr></table></div>';
+}
+function stringBlock(v,cols){
+  const f=st.file,c=f.columns[v];
+  const s=cols.map(col=>{
+    const set=new Set(); let n=0;
+    for(const i of col.rows){const x=c[i]; if(x!==null&&x!==''){n++;set.add(x);}}
+    return {n,d:set.size};
+  });
+  return '<div class="qblock"><p class="qh">'+hl(f.varLabels[v]||v)+
+    '<span class="tag drift">text</span></p><p class="qm num">'+hl(v)+
+    ' · open-ended text, not tabulated</p><table>'+colGroup(cols.length)+
+    '<tr><th>Code</th><th></th>'+cols.map(x=>'<th class="r">'+thLabel(x)+'</th>').join('')+'</tr>'+
+    '<tr><td></td><td>Distinct responses</td>'+s.map(x=>'<td class="r num">'+(x.n?x.d:'<span class="muted">—</span>')+'</td>').join('')+'</tr>'+
+    '<tr class="total"><td></td><td class="muted">Base</td>'+
+    s.map(x=>'<td class="r num muted">'+(x.n||'—')+'</td>').join('')+'</tr></table></div>';
+}
+function thLabel(c){
+  return '<span class="lfull">'+esc(c.label)+'</span>'+
+         '<span class="lshort">'+esc(c.short||c.label)+'</span>';
+}
+function colGroup(n){
+  return '<colgroup><col class="c-code"><col class="c-resp">'+
+    '<col class="c-data">'.repeat(n)+'</colgroup>';
+}
+// one label-column width for the whole section, wide enough for its longest label
+function fitLabelCol(panel,varName,size,bold,min,max,pad){
+  if(!panel) return;
+  const ctx=fitLabelCol._c||(fitLabelCol._c=document.createElement('canvas').getContext('2d'));
+  const fam=getComputedStyle(document.body).fontFamily;
+  const per=[];
+  panel.querySelectorAll('table').forEach(t=>{
+    let w=0;
+    t.querySelectorAll('tr').forEach(tr=>{
+      const td=tr.children[1];
+      if(!td||td.tagName!=='TD') return;
+      ctx.font=(bold&&tr.classList.contains('net')?'600 ':'')+size+'px '+fam;
+      const x=ctx.measureText(td.textContent.trim()).width+(tr.classList.contains('sub-row')?26:0);
+      if(x>w) w=x;
+    });
+    if(w) per.push(w);
+  });
+  panel.style.setProperty(varName,Math.max(min,Math.min(max,Math.ceil(pctl(per,.85))+pad))+'px');
+}
+// pin every table to the sum of its columns so extra columns scroll sideways
+// instead of squeezing (keeps headers readable and every table identical)
+function pinTables(panel){
+  if(!panel) return;
+  panel.querySelectorAll('table').forEach(t=>{
+    let w=0; t.querySelectorAll('col').forEach(c=>{w+=parseFloat(getComputedStyle(c).width)||0;});
+    if(w) t.style.width=Math.ceil(w)+'px';
+  });
+}
+// widest data column (within max) that lets n columns fit in the space left
+function fitDataCol(avail,fixed,n,min,max){
+  if(!n) return max;
+  return Math.max(min,Math.min(max,Math.floor((avail-fixed)/n)));
+}
+// a width that suits most questions; a few unusually long labels wrap instead
+function pctl(a,q){
+  if(!a.length) return 0;
+  const s=a.slice().sort((x,y)=>x-y);
+  return s[Math.min(s.length-1,Math.floor(s.length*q))];
+}
+function renderTopline(){
+  const f=st.file,cols=toplineColumns(),mode=$('qfilter').value;
+  renderColPicker();
+  const dataW=cols.length<=3?134:cols.length<=4?122:cols.length<=6?106:94;
+  const panel=$('topline');
+  panel.style.setProperty('--dataw',dataW+'px');
+  panel.scrollLeft=0;
+  const rimVars=new Set(); st.scenarios.forEach(s=>s.rims.forEach(r=>rimVars.add(r.varName)));
+  const drift=new Set(driftVars());
+  const lastScen=cols.filter(c=>c.scen).slice(-1)[0];
+  const baseCol=cols[0];
+  let shown=0;
+  const mrCount=st.mrSets.reduce((a,s)=>a+s.members.length,0);
+  const excluded=(st.waveVar?1:0)+(st.weightVar?1:0);
+  let netQ=0;
+  if(st.showNets) f.names.forEach(v=>{ if(v!==st.waveVar&&v!==st.weightVar&&netsFor(v).length) netQ++; });
+  const meta=$('topmeta');
+  let h='';
+  const done=new Set();
+  f.names.forEach(v=>{
+    if(v===st.waveVar||v===st.weightVar||done.has(v)) return;
+    const mr=st.mrSets.find(s=>s.members.includes(v));
+    if(mr){ mr.members.forEach(m=>done.add(m));
+      if(mr.members.some(m=>matches(m))){ shown++; h+=mrBlock(mr,cols); } return; }
+    if(mode==='nonrim'&&rimVars.has(v)) return;
+    if(!matches(v)) return;
+    const vl=f.valueLabels[v];
+    if(f.types[v]!=='numeric'){
+      if(mode!=='moved'){ shown++; h+=stringBlock(v,cols); }
+      return;
+    }
+    if(!vl||!Object.keys(vl).length){
+      if(mode!=='moved'){ shown++; h+=numericBlock(v,cols); }
+      return;
+    }
+    shown++;
+    const codes=Object.keys(vl).map(Number).sort((a,b)=>a-b);
+    const nets=st.showNets?netsFor(v):[];
+    const netOf={}; nets.forEach(g=>{netOf[g.codes[0]]=g;});
+    const inNet=new Set(); nets.forEach(g=>g.codes.forEach(c=>inNet.add(c)));
+    const rowsHtml=[]; let maxMove=0;
+    const track=cells=>{ if(lastScen&&baseCol!==lastScen){
+      const a=cells[0],b=cells[cols.indexOf(lastScen)];
+      if(a!==null&&b!==null) maxMove=Math.max(maxMove,Math.abs(b-a)); } };
+    codes.forEach(code=>{
+      if(netOf[code]){
+        const g=netOf[code];
+        const cells=cols.map(c=>pctSet(v,g.codes,c));
+        track(cells);
+        rowsHtml.push('<tr class="net"><td></td><td>'+esc(netLabel(g))+'</td>'+
+          cells.map(x=>'<td class="r num">'+(x===null?'<span class="muted">—</span>':x.toFixed(1)+'%')+'</td>').join('')+'</tr>');
+      }
+      const cells=cols.map(c=>pct(v,code,c));
+      track(cells);
+      rowsHtml.push('<tr'+(inNet.has(code)?' class="sub-row"':'')+'><td class="num muted">'+code+'</td><td>'+
+        hl(vl[code])+'</td>'+
+        cells.map(x=>'<td class="r num">'+(x===null?'<span class="muted">not asked</span>':x.toFixed(1)+'%')+'</td>').join('')+'</tr>');
+    });
+    if(mode==='moved'&&maxMove<3){ shown--; return; }
+    let tags='';
+    if(rimVars.has(v)) tags+='<span class="tag rim">rim</span>';
+    if(drift.has(v)) tags+='<span class="tag drift">codeframe drift</span>';
+    const added=st.justAdded&&st.justAdded.v===v
+      ? '<p class="note info" style="margin:6px 0 10px">Added to '+esc(st.justAdded.name)+
+        ' with targets set to the current sample. Edit them in the scenario above.</p>' : '';
+    h+='<div class="qblock"><div class="qtop"><div class="qmeta">'+
+      '<p class="qh">'+hl(f.varLabels[v]||v)+tags+'</p>'+
+      '<p class="qm num">'+hl(v)+'</p></div>'+addWeightHTML(v)+'</div>'+added+
+      '<table>'+colGroup(cols.length)+'<tr><th>Code</th><th>Response</th>'+
+      cols.map(c=>'<th class="r">'+thLabel(c)+(c.note?'<br><span class="hnote2">'+c.note+'</span>':'')+'</th>').join('')+
+      '</tr>'+rowsHtml.join('')+
+      '<tr class="total"><td></td><td class="muted">Base</td>'+
+      cols.map(c=>{let n=0;const cc=f.columns[v];c.rows.forEach(i=>{if(cc[i]!==null)n++});
+        return '<td class="r num muted">'+(n||'—')+'</td>';}).join('')+'</tr></table></div>';
+  });
+  const bits=[shown+' of '+f.names.length+' variables shown'];
+  if(mrCount) bits.push(mrCount+' in '+st.mrSets.length+' multiple-response set'+(st.mrSets.length===1?'':'s'));
+  if(excluded) bits.push(excluded+' excluded ('+
+    [st.waveVar?'wave':'',st.weightVar?'weight':''].filter(Boolean).join(', ')+')');
+  if(st.showNets&&netQ) bits.push('combined rows on '+netQ);
+  meta.textContent=st.query
+    ? shown+' question'+(shown===1?'':'s')+' matching "'+st.query+'"'
+    : cols.length+' columns · '+bits.join(' · ');
+  $('topline').innerHTML=h||'<p class="muted" style="padding:16px 20px">'+
+    (st.query?'Nothing matches "'+esc(st.query)+'".':'No questions match this filter.')+'</p>';
+  fitLabelCol($('topline'),'--respw',13,true,240,430,26);
+  { const tp=$('topline'),rw=parseFloat(tp.style.getPropertyValue('--respw'))||240;
+    tp.style.setProperty('--dataw',fitDataCol(tp.clientWidth-52,52+rw,cols.length,84,dataW)+'px');
+    pinTables(tp); }
+  collectMarks(); wireAddWeight(); st.justAdded=null;
+  const ph=$('printhdr');
+  if(ph) ph.innerHTML='<div class="ph-file">Topline \u2014 '+esc(st.fileName)+'</div>'+
+    '<div class="ph-meta">'+esc(toplineNotes())+'</div>';
+  document.querySelectorAll('#topline .qblock').forEach(b=>
+    b.classList.toggle('splitok', b.querySelectorAll('tr').length>22));
+  scheduleSave();
+}
+function mrBlock(mr,cols){
+  const f=st.file,vl=f.valueLabels[mr.members[0]]||{};
+  const codes=Object.keys(vl).map(Number).sort((a,b)=>a-b);
+  const live=mr.members.filter(m=>f.columns[m].some(x=>x!==null));
+  const anyRow=i=>live.some(m=>f.columns[m][i]!==null);
+  let h='<div class="qblock"><p class="qh">'+hl(f.varLabels[mr.members[0]]||mr.name)+
+    '<span class="tag mr">multiple response</span></p>'+
+    '<p class="qm num">'+mr.members[0]+'–'+mr.members[mr.members.length-1]+
+    ' · percentages sum above 100%</p><table>'+colGroup(cols.length)+'<tr><th>Code</th><th>Response</th>'+
+    cols.map(c=>'<th class="r">'+thLabel(c)+'</th>').join('')+'</tr>';
+  codes.forEach(code=>{
+    h+='<tr><td class="num muted">'+code+'</td><td>'+hl(vl[code])+'</td>';
+    cols.forEach(c=>{
+      let den=0,num=0;
+      for(let k=0;k<c.rows.length;k++){const i=c.rows[k];
+        if(!anyRow(i)) continue; den+=c.w[k];
+        live.forEach(m=>{if(f.columns[m][i]===code) num+=c.w[k];});}
+      h+='<td class="r num">'+(den?(100*num/den).toFixed(1)+'%':'<span class="muted">not asked</span>')+'</td>';
+    });
+    h+='</tr>';
+  });
+  h+='<tr class="total"><td></td><td class="muted">Base</td>'+
+    cols.map(c=>{let n=0;c.rows.forEach(i=>{if(anyRow(i))n++});
+      return '<td class="r num muted">'+(n||'—')+'</td>';}).join('')+'</tr></table></div>';
+  return h;
+}
+
+/* ==== SYNTAX ==== */
+function renderSyntax(){
+  scheduleSave();
+  const sel=$('synpick'),prev=sel.value;
+  sel.innerHTML=st.scenarios.map((s,i)=>'<option value="'+i+'">'+s.name+'</option>').join('');
+  sel.value=(prev&&prev<st.scenarios.length)?prev:st.active;
+  drawSyntax();
+}
+function drawSyntax(){
+  const s=st.scenarios[+$('synpick').value||0];
+  const v=validate(s);
+  if(!s.rims.length){
+    $('syntax').textContent='Add at least one rim variable to generate syntax.';
+    $('synmeta').textContent=''; $('synwarn').innerHTML=''; return;
+  }
+  if(v.errors.length){
+    $('syntax').textContent='Fix the target errors above before exporting.';
+    $('synmeta').textContent=s.name;
+    $('synwarn').innerHTML='<p class="note bad" style="margin:0;border-radius:0">'+v.errors.join('<br>')+'</p>';
+    return;
+  }
+  $('syntax').textContent=buildSyntax(s,st);
+  const d=s.diag;
+  $('synmeta').textContent=(st.weightVar||'Weight')+' · POPTOTAL '+s.popTotal+' · '+s.rims.length+
+    ' rim'+(s.rims.length===1?'':'s')+(d?' · deff '+d.deff.toFixed(2)+' · max wt '+d.max.toFixed(2):'');
+  const wn=v.warnings.slice();
+  if(s.converged===false) wn.unshift('Targets were not fully met after 20 iterations (largest gap '+
+    (s.dev*100).toFixed(4)+' points). SPSS will stop at the same limit.');
+  $('synwarn').innerHTML=wn.length?
+    '<p class="note warn" style="margin:0;border-radius:0">'+wn.join('<br>')+'</p>':'';
+}
+$('synpick').onchange=drawSyntax;
+const smooth=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth';
+$('gotop').onclick=()=>scrollTo({top:0,behavior:smooth()});
+$('gobot').onclick=()=>scrollTo({top:document.body.scrollHeight,behavior:smooth()});
+$('qfilter').onchange=renderTopline;
+$('netsbox').onchange=e=>{st.showNets=e.target.checked;renderTopline();};
+/* ==== PDF EXPORT (vector, self-contained) ==== */
+const HELV=('278 278 355 556 556 889 667 191 333 333 389 584 278 333 278 278 556 556 556 556 556 556 556 556 '+
+'556 556 278 278 584 584 584 556 1015 667 667 722 722 667 611 778 722 278 500 667 556 833 722 778 667 778 '+
+'722 667 611 722 667 944 667 667 611 278 278 278 469 556 333 556 556 500 556 556 278 556 556 222 222 500 '+
+'222 833 556 556 556 556 333 500 278 556 500 722 500 500 500 334 260 334 584').split(' ').map(Number);
+const HELVB=('278 333 474 556 556 889 722 238 333 333 389 584 278 333 278 278 556 556 556 556 556 556 556 556 '+
+'556 556 333 333 584 584 584 611 975 722 722 722 722 667 611 778 722 278 556 722 611 833 722 778 667 778 '+
+'722 667 611 722 667 944 667 667 611 333 278 333 584 556 333 556 611 556 611 556 333 611 611 278 278 556 '+
+'278 889 611 611 611 611 389 556 333 611 556 778 556 556 500 389 280 389 584').split(' ').map(Number);
+const EXTRAW={0x85:1000,0x91:222,0x92:222,0x93:333,0x94:333,0x95:350,0x96:556,0x97:1000,0xb7:278};
+const UNIMAP={0x2018:0x91,0x2019:0x92,0x201c:0x93,0x201d:0x94,0x2013:0x96,0x2014:0x97,
+  0x2022:0x95,0x2026:0x85,0x2212:0x2d,0x00a0:0x20,0x2009:0x20,0x202f:0x20};
+function winAnsi(s){
+  let o='';
+  for(const ch of String(s)){
+    let c=ch.codePointAt(0);
+    if(UNIMAP[c]!==undefined) c=UNIMAP[c];
+    if(c>255) c=63;
+    o+=String.fromCharCode(c);
+  }
+  return o;
+}
+function charW(c,bold){
+  if(c>=32&&c<=126) return (bold?HELVB:HELV)[c-32];
+  if(EXTRAW[c]!==undefined) return EXTRAW[c];
+  return bold?611:556;
+}
+function textW(s,size,bold){
+  let t=0; for(let i=0;i<s.length;i++) t+=charW(s.charCodeAt(i),bold);
+  return t*size/1000;
+}
+function wrapText(s,size,bold,maxW){
+  const words=winAnsi(s).split(/\s+/).filter(Boolean), out=[]; let line='';
+  words.forEach(w=>{
+    const t=line?line+' '+w:w;
+    if(textW(t,size,bold)<=maxW){ line=t; return; }
+    if(line){ out.push(line); line=''; }
+    if(textW(w,size,bold)<=maxW){ line=w; return; }
+    let cur='';
+    for(const ch of w){ if(cur&&textW(cur+ch,size,bold)>maxW){ out.push(cur); cur=ch; } else cur+=ch; }
+    line=cur;
+  });
+  if(line) out.push(line);
+  return out.length?out:[''];
+}
+function pdfEsc(s){ return s.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)'); }
+const f2=n=>(Math.round(n*100)/100).toString();
+
+// read the topline exactly as it is on screen
+function toplineData(){
+  const out=[];
+  document.querySelectorAll('#topline .qblock').forEach(b=>{
+    const tbl=b.querySelector('table'); if(!tbl) return;
+    const rows=[...tbl.querySelectorAll('tr')]; if(!rows.length) return;
+    const cols=[...rows[0].children].map((th,i)=>{
+      if(i<2) return {label:th.textContent.trim(),note:''};
+      const s=th.querySelector('.lshort'), n=th.querySelector('.hnote2');
+      return {label:(s||th).textContent.trim(), note:n?n.textContent.trim():''};
+    });
+    const qh=b.querySelector('.qh'); let title='';
+    if(qh){ const cl=qh.cloneNode(true); cl.querySelectorAll('.tag').forEach(t=>t.remove());
+      title=cl.textContent.replace(/\s+/g,' ').trim(); }
+    out.push({
+      title, meta:((b.querySelector('.qm')||{}).textContent||'').replace(/\s+/g,' ').trim(),
+      tags:[...b.querySelectorAll('.tag')].map(t=>t.textContent.trim()),
+      cols,
+      body:rows.slice(1).map(tr=>({
+        net:tr.classList.contains('net'), sub:tr.classList.contains('sub-row'),
+        total:tr.classList.contains('total'),
+        cells:[...tr.children].map(td=>td.textContent.replace(/\s+/g,' ').trim())
+      }))
+    });
+  });
+  return out;
+}
+function toplineNotes(){
+  const cols=toplineColumns(), bits=[];
+  if(st.waveVar) bits.push('Current wave: '+st.waveLabel(st.currentWave));
+  bits.push('Columns: '+cols.map(c=>c.label.replace(/\s+/g,' ')).join('  |  '));
+  const mode=$('qfilter').value;
+  if(mode==='nonrim') bits.push('Rim variables excluded');
+  if(mode==='moved') bits.push('Only questions that move 3+ points');
+  if(st.query) bits.push('Filtered by "'+st.query+'"');
+  if(!st.showNets) bits.push('Combined rows off');
+  const n=document.querySelectorAll('#topline .qblock').length;
+  bits.push(n+' question'+(n===1?'':'s'));
+  return bits.join('  ·  ')+'  ·  '+stamp();
+}
+
+function buildToplinePdf(){
+  const blocks=toplineData();
+  if(!blocks.length) return null;
+  const nData=Math.max(1,blocks[0].cols.length-2);
+  const land=nData>4;
+  const PW=land?792:612, PH=land?612:792, M=36;
+  const avail=PW-2*M, codeW=24;
+  const FS=9, HFS=7.5, NFS=6.5, LH=10.6, GAP=7;
+  let dataW=64, respW=avail-codeW-nData*dataW;
+  while(respW<130&&dataW>42){ dataW-=2; respW=avail-codeW-nData*dataW; }
+  if(respW<60){ dataW=Math.max(34,(avail-codeW-60)/nData); respW=avail-codeW-nData*dataW; }
+  // keep the numbers next to their labels rather than out at the page edge
+  const lw=blocks.map(b=>b.body.reduce((m,r)=>
+    Math.max(m,textW(winAnsi(r.cells[1]||''),FS,r.net)+(r.sub?10:0)),0)).filter(Boolean);
+  respW=Math.max(110,Math.min(respW,Math.ceil(pctl(lw,.85))+12));
+  const RIGHT=M+codeW+respW+nData*dataW;
+  // with many columns, shrink header text so no word is split mid-way
+  let HF=HFS, NF=NFS;
+  { let wmax=0, nmax=0;
+    blocks.forEach(b=>b.cols.slice(2).forEach(c=>{
+      winAnsi(c.label).split(/\s+/).forEach(w=>{ wmax=Math.max(wmax,textW(w,HFS,false)); });
+      if(c.note) nmax=Math.max(nmax,textW(winAnsi(c.note),NFS,false));
+    }));
+    if(wmax>dataW-4) HF=Math.max(5.5,Math.floor(HFS*(dataW-4)/wmax*10)/10);
+    if(nmax>dataW-4) NF=Math.max(5,Math.floor(NFS*(dataW-4)/nmax*10)/10);
+  }
+  const pages=[]; let ops=null, y=0;
+  const limit=PH-M-16;
+  const colX=i=>M+codeW+respW+i*dataW;
+
+  const T=(x,top,s,size,bold,gray,align,w)=>{
+    s=winAnsi(s); if(!s) return;
+    let tx=x; if(align==='r') tx=x+w-textW(s,size,bold);
+    ops.push('BT /'+(bold?'F2':'F1')+' '+size+' Tf '+f2(gray==null?0:gray)+' g 1 0 0 1 '+
+      f2(tx)+' '+f2(PH-top-size*0.79)+' Tm ('+pdfEsc(s)+') Tj ET');
+  };
+  const LN=(x1,top,x2,wd,gray)=>ops.push(f2(wd)+' w '+f2(gray)+' G '+f2(x1)+' '+f2(PH-top)+
+    ' m '+f2(x2)+' '+f2(PH-top)+' l S');
+  const BOX=(x,top,w,h,gray)=>ops.push(f2(gray)+' g '+f2(x)+' '+f2(PH-top-h)+' '+f2(w)+' '+f2(h)+' re f');
+  const newPage=()=>{ ops=[]; pages.push(ops); y=M; };
+
+  const rowH=r=>Math.max(1,wrapText(r.cells[1]||'',FS,r.net,respW-(r.sub?10:0)-6).length)*LH;
+  const headH=cols=>{
+    let ln=1; for(let i=2;i<cols.length;i++) ln=Math.max(ln,wrapText(cols[i].label,HF,false,dataW-4).length);
+    return ln*(HF+1.8)+(cols.some(c=>c.note)?NF+1.5:0)+3.5;
+  };
+  const drawHead=cols=>{
+    const h=headH(cols), noteY=y+h-3.5-(cols.some(c=>c.note)?NF+1.5:0);
+    T(M,y,'Code',HF,false,.42);
+    T(M+codeW,y,cols[1].label,HF,false,.42);
+    for(let i=2;i<cols.length;i++){
+      const lines=wrapText(cols[i].label,HF,false,dataW-4);
+      lines.forEach((ln,k)=>T(colX(i-2),y+k*(HF+1.8),ln,HF,false,.42,'r',dataW-4));
+      if(cols[i].note) T(colX(i-2),noteY,cols[i].note,NF,false,.55,'r',dataW-4);
+    }
+    y+=h; LN(M,y-1.5,RIGHT,.7,.45);
+  };
+  const drawRows=(blk,from)=>{
+    for(let i=from;i<blk.body.length;i++){
+      const r=blk.body[i], h=rowH(r);
+      if(y+h>limit){ newPage();
+        T(M,y,blk.title,FS,true,0); y+=LH+1;
+        T(M,y,'continued',NFS,false,.5); y+=NFS+3;
+        drawHead(blk.cols);
+      }
+      if(r.net) BOX(M,y-1,RIGHT-M,h,.93);
+      if(r.total) LN(M,y-1,RIGHT,.5,.75);
+      const g=r.total?.4:(r.sub?.35:0);
+      if(!r.net&&!r.total) T(M,y+1+(FS-7)*0.79,r.cells[0]||'',7,false,.5);
+      wrapText(r.cells[1]||'',FS,r.net,respW-(r.sub?10:0)-6)
+        .forEach((ln,k)=>T(M+codeW+(r.sub?10:0),y+1+k*LH,ln,FS,r.net,r.net?0:g));
+      for(let c=2;c<r.cells.length;c++)
+        T(colX(c-2),y+1,r.cells[c],FS,r.net||r.total,r.net?0:(r.cells[c]==='not asked'?.55:g),'r',dataW-4);
+      y+=h;
+      if(!r.total&&!blk.body[i+1]?.total) LN(M,y,RIGHT,.35,.9);
+    }
+  };
+
+  newPage();
+  T(M,y,'Topline — '+st.fileName,11,true,0); y+=15;
+  wrapText(toplineNotes(),NFS+.5,false,avail).forEach(ln=>{ T(M,y,ln,NFS+.5,false,.4); y+=NFS+3; });
+  y+=2; LN(M,y,Math.max(RIGHT,M+360),1,.25); y+=GAP+1;
+
+  blocks.forEach(blk=>{
+    const tLines=wrapText(blk.title,FS,true,avail);
+    const blockH=tLines.length*(LH+1)+NFS+3+headH(blk.cols)+
+      blk.body.reduce((a,r)=>a+rowH(r),0)+GAP;
+    const usable=limit-M, remain=limit-y;
+    const big=blockH>usable*0.45;          // long questions may flow across pages
+    if(blockH>remain && !(big&&remain>=110)) newPage();
+    tLines.forEach((ln,k)=>{
+      T(M,y,ln,FS,true,0);
+      if(k===tLines.length-1&&blk.meta){
+        const w=textW(winAnsi(ln),FS,true);
+        if(M+w+5+textW(winAnsi(blk.meta),NFS,false)<=PW-M){
+          T(M+w+5,y+1.4,blk.meta,NFS,false,.5); blk._metaDone=true;
+        }
+      }
+      y+=LH+1;
+    });
+    if(blk.meta&&!blk._metaDone){ T(M,y,blk.meta,NFS,false,.5); y+=NFS+3; } else y+=2;
+    drawHead(blk.cols);
+    drawRows(blk,0);
+    y+=GAP;
+  });
+
+  const N=pages.length;
+  pages.forEach((p,i)=>{
+    ops=p;
+    T(M,PH-M+4,st.fileName,NFS,false,.5);
+    T(PW-M-120,PH-M+4,'Page '+(i+1)+' of '+N,NFS,false,.5,'r',120);
+  });
+
+  const objs=[]; const kids=[];
+  for(let i=0;i<N;i++) kids.push((5+2*i)+' 0 R');
+  objs[1]='<</Type/Catalog/Pages 2 0 R>>';
+  objs[2]='<</Type/Pages/Count '+N+'/Kids['+kids.join(' ')+']>>';
+  objs[3]='<</Type/Font/Subtype/Type1/BaseFont/Helvetica/Encoding/WinAnsiEncoding>>';
+  objs[4]='<</Type/Font/Subtype/Type1/BaseFont/Helvetica-Bold/Encoding/WinAnsiEncoding>>';
+  for(let i=0;i<N;i++){
+    const s=pages[i].join('\n');
+    objs[5+2*i]='<</Type/Page/Parent 2 0 R/MediaBox[0 0 '+PW+' '+PH+
+      ']/Resources<</Font<</F1 3 0 R/F2 4 0 R>>>>/Contents '+(6+2*i)+' 0 R>>';
+    objs[6+2*i]='<</Length '+s.length+'>>\nstream\n'+s+'\nendstream';
+  }
+  let out='%PDF-1.4\n'; const off=[];
+  for(let i=1;i<objs.length;i++){ off[i]=out.length; out+=i+' 0 obj\n'+objs[i]+'\nendobj\n'; }
+  const xref=out.length;
+  out+='xref\n0 '+objs.length+'\n0000000000 65535 f \n';
+  for(let i=1;i<objs.length;i++) out+=('0000000000'+off[i]).slice(-10)+' 00000 n \n';
+  out+='trailer\n<</Size '+objs.length+'/Root 1 0 R>>\nstartxref\n'+xref+'\n%%EOF';
+  const bytes=new Uint8Array(out.length);
+  for(let i=0;i<out.length;i++) bytes[i]=out.charCodeAt(i)&0xff;
+  return {bytes,pages:N};
+}
+function savePdf(){
+  if(!st.file) return;
+  const btn=$('pdfbtn'), stat=$('pdfstat');
+  btn.disabled=true; btn.textContent='Building…'; stat.textContent='';
+  setTimeout(()=>{
+    try{
+      const doc=buildToplinePdf();
+      if(!doc){ stat.textContent='Nothing to export — no questions are showing.'; return; }
+      const d=new Date(), tz='America/Denver';
+      const day=d.toLocaleDateString('en-CA',{timeZone:tz});
+      const name='Topline - '+st.fileName.replace(/\.sav$/i,'')+' - '+day+'.pdf';
+      const url=URL.createObjectURL(new Blob([doc.bytes],{type:'application/pdf'}));
+      const a=document.createElement('a'); a.href=url; a.download=name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),4000);
+      stat.textContent='Saved '+name+' ('+doc.pages+' page'+(doc.pages===1?'':'s')+') to your downloads.';
+    }catch(e){
+      stat.textContent='Could not build the PDF: '+e.message;
+    }finally{
+      btn.disabled=false; btn.textContent='Save as PDF';
+    }
+  },30);
+}
+
+$('pdfbtn').onclick=savePdf;
+$('newproj').onclick=newProject;
+$('newproj2').onclick=newProject;
+addEventListener('beforeunload',()=>{ if(saveTimer){ clearTimeout(saveTimer); saveNow(); } });
+startup();
+let searchTimer=null;
+function applyQuery(){
+  clearTimeout(searchTimer); searchTimer=null;
+  const q=$('search').value.trim().toLowerCase();
+  if(q===st.query) return false;
+  st.query=q; renderTopline(); return true;
+}
+function collectMarks(){
+  st.marks=[].slice.call(document.querySelectorAll('#topline mark'));
+  st.markIdx=-1; updateMatchUI();
+}
+function updateMatchUI(){
+  const box=$('matchcount');
+  if(!st.query||!st.marks.length){ box.classList.add('hide'); return; }
+  box.classList.remove('hide');
+  $('matchtext').textContent=(st.markIdx<0?st.marks.length+' match'+(st.marks.length===1?'':'es'):
+    (st.markIdx+1)+' of '+st.marks.length);
+}
+function gotoMark(dir){
+  if(!st.marks.length) return;
+  if(st.markIdx>=0&&st.marks[st.markIdx]) st.marks[st.markIdx].classList.remove('active');
+  st.markIdx=(st.markIdx+dir+st.marks.length)%st.marks.length;
+  const m=st.marks[st.markIdx];
+  m.classList.add('active');
+  m.scrollIntoView({block:'center',behavior:smooth()});
+  updateMatchUI();
+}
+$('search').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase();
+  $('clearsearch').classList.toggle('hide',!q);
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>{ st.query=q; renderTopline(); },120);
+});
+$('search').addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ clearSearch(); return; }
+  if(e.key==='Enter'){
+    e.preventDefault();
+    applyQuery();
+    gotoMark(e.shiftKey?-1:1);
+  }
+});
+$('nextmatch').onclick=()=>{$('search').focus();gotoMark(1)};
+$('prevmatch').onclick=()=>{$('search').focus();gotoMark(-1)};
+$('clearsearch').onclick=clearSearch;
+function clearSearch(){
+  $('search').value=''; st.query=''; st.markIdx=-1; $('clearsearch').classList.add('hide');
+  renderTopline(); $('search').focus();
+}
+addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='k'){ e.preventDefault();
+    if(!$('jump').classList.contains('hide')){ $('search').focus(); $('search').select(); } }
+});
+function legacyCopy(txt){
+  // navigator.clipboard is unavailable on file:// pages, so fall back to execCommand
+  const ta=document.createElement('textarea');
+  ta.value=txt;
+  ta.setAttribute('readonly','');
+  ta.style.cssText='position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:none;'+
+    'outline:none;box-shadow:none;background:transparent;opacity:0';
+  document.body.appendChild(ta);
+  const sel=getSelection(), prev=sel.rangeCount?sel.getRangeAt(0):null;
+  ta.select(); ta.setSelectionRange(0,txt.length);
+  let ok=false;
+  try{ ok=document.execCommand('copy'); }catch(e){ ok=false; }
+  document.body.removeChild(ta);
+  if(prev){ sel.removeAllRanges(); sel.addRange(prev); }
+  return ok;
+}
+async function copyText(txt){
+  if(navigator.clipboard&&window.isSecureContext){
+    try{ await navigator.clipboard.writeText(txt); return true; }catch(e){}
+  }
+  return legacyCopy(txt);
+}
+$('copy').onclick=async()=>{
+  const txt=$('syntax').textContent,btn=$('copy'),stat=$('copystat');
+  const ok=await copyText(txt);
+  if(ok){
+    btn.textContent='Copied';
+    stat.textContent=$('synpick').selectedOptions[0].text+
+      ' copied — paste into an email and send to Travis and Tyler.';
+    setTimeout(()=>btn.textContent='Copy to clipboard',2000);
+  } else {
+    const r=document.createRange(); r.selectNodeContents($('syntax'));
+    const sl=getSelection(); sl.removeAllRanges(); sl.addRange(r);
+    stat.textContent='Your browser blocked the copy — the syntax is selected, press Ctrl+C (or Cmd+C).';
+  }
+};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+</script>
+</body>
+</html>
