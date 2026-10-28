@@ -352,8 +352,18 @@ async function run(e){
     let make, vars, cps=null;
     if(pop==="adults"){vars=B15;make=v=>fromB15(v)}
     else{vars=B29;cps=await getCPS(pop==="voters"?elec:"2024",st); make=v=>fromB29(v,cps,pop)}
-    const get="NAME,"+vars.join(",");
-    const fetchACS=y=>Promise.all([getJSON(`${y}/acs/acs5`,{get,for:"state:"+st}),getJSON(`${y}/acs/acs5`,{get,for:GEO[geo].forv,in:"state:"+st})]);
+    // The Census API allows at most 50 variables per request, so long tables are fetched in pieces and joined by geography.
+    const chunks=[];for(let i=0;i<vars.length;i+=45)chunks.push(vars.slice(i,i+45));
+    const fetchMerged=async(path,params)=>{
+      const parts=await Promise.all(chunks.map(c=>getJSON(path,{...params,get:"NAME,"+c.join(",")})));
+      if(parts.length===1)return parts[0];
+      const [h0,...r0]=parts[0], gi=h0.findIndex((h,i)=>i>0&&!/^B\d/.test(h)&&h!=="NAME");
+      const key=r=>r.slice(gi).join("|");
+      const maps=parts.slice(1).map(([h,...rows])=>{const g=h.findIndex((x,i)=>i>0&&!/^B\d/.test(x)&&x!=="NAME");return {h,g,m:new Map(rows.map(r=>[r.slice(g).join("|"),r]))}});
+      const head=[...h0.slice(0,gi),...maps.flatMap(x=>x.h.slice(1,x.g)),...h0.slice(gi)];
+      return [head,...r0.map(r=>[...r.slice(0,gi),...maps.flatMap(x=>{const o=x.m.get(key(r));return o?o.slice(1,x.g):x.h.slice(1,x.g).map(()=>"0")}),...r.slice(gi)])];
+    };
+    const fetchACS=y=>Promise.all([fetchMerged(`${y}/acs/acs5`,{for:"state:"+st}),fetchMerged(`${y}/acs/acs5`,{for:GEO[geo].forv,in:"state:"+st})]);
     let sJ,uJ,lastErr;
     for(const y of acsCandidates()){
       try{[sJ,uJ]=await fetchACS(y);year=y;acsYear=y;break}
