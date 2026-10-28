@@ -1,95 +1,115 @@
 
-== Census tables page: /data/tables/time-series/demo/voting-and-registration/p20-590.html
-xlsx links: 30
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote01_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote01a_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_1.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_2.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_3.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_4.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_5.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_6.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_7.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_8.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_9.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote03_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote04a_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote04b_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote04c_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote05_2024_1.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote05_2024_2.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote05_2024_3.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote05_2024_4.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote05_2024_5.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote05_2024_6.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote06_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote07_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote08_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote09_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote10_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote11_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote12_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote13_2024.xlsx
-   https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote14_2024.xlsx
-Table 5: https://www2.census.gov/programs-surveys/cps/tables/p20/587/vote02_2024_5.xlsx
-
-== Published Table 5 (first 40 rows)
-Table with row headers in columns A and B and column headers in rows 5 through 7 and 27 through 29
-Table 2. Reported Voting and Registration, by Race, Hispanic Origin, Sex, and Age: November 2024
+== vote05_2024_1.xlsx
+Table with row headers in columns A and B and column headers in rows 5 through 7 and 30 through 32
+Table 5. Reported Voting and Registration by Age, Sex, and Educational Attainment: November 2024
 (Numbers in thousands)
-Asian Alone
+18 Years and Over
 Characteristics | Total population | United States citizen | Total population
 Total citizen population | Reported registered | Reported not registered | No response to registration1 | Reported voted | Reported not voted | No response to voting2 | Reported registered | Reported voted
 Number | Percent | Number | Percent | Number | Percent | Number | Percent | Number | Percent | Number | Percent | Percent | Percent
-BOTH SEXES | Total 18 years and over | 17712 | 12775 | 8337 | 65.3 | 2089 | 16.4 | 2349 | 18.4 | 7288 | 57.1 | 3151 | 24.7 | 2336 | 18.3 | 47.1 | 41.1
-BOTH SEXES | 18 to 24 years | 1989 | 1497 | 816 | 54.5 | 276 | 18.5 | 405 | 27 | 658 | 44 | 433 | 28.9 | 406 | 27.1 | 41 | 33.1
-BOTH SEXES | 25 to 44 years | 6999 | 4365 | 2857 | 65.5 | 782 | 17.9 | 726 | 16.6 | 2490 | 57 | 1141 | 26.1 | 735 | 16.8 | 40.8 | 35.6
-BOTH SEXES | 45 to 64 years | 5549 | 4354 | 3012 | 69.2 | 608 | 14 | 734 | 16.8 | 2679 | 61.5 | 938 | 21.5 | 738 | 16.9 | 54.3 | 48.3
-BOTH SEXES | 65 to 74 years | 1825 | 1434 | 959 | 66.9 | 234 | 16.3 | 241 | 16.8 | 858 | 59.9 | 332 | 23.1 | 244 | 17 | 52.6 | 47
-BOTH SEXES | 75 years and over | 1350 | 1125 | 693 | 61.6 | 189 | 16.7 | 244 | 21.7 | 604 | 53.7 | 308 | 27.3 | 214 | 19 | 51.3 | 44.7
-MALE | Total 18 years and over | 8381 | 6032 | 3879 | 64.3 | 1010 | 16.7 | 1143 | 18.9 | 3368 | 55.8 | 1551 | 25.7 | 1112 | 18.4 | 46.3 | 40.2
-MALE | 18 to 24 years | 1037 | 726 | 379 | 52.2 | 140 | 19.3 | 207 | 28.5 | 280 | 38.6 | 242 | 33.3 | 204 | 28 | 36.5 | 27
-MALE | 25 to 44 years | 3368 | 2114 | 1346 | 63.7 | 388 | 18.4 | 379 | 17.9 | 1177 | 55.7 | 559 | 26.4 | 378 | 17.9 | 40 | 35
-MALE | 45 to 64 years | 2588 | 2043 | 1424 | 69.7 | 281 | 13.8 | 337 | 16.5 | 1260 | 61.7 | 457 | 22.4 | 326 | 15.9 | 55 | 48.7
-MALE | 65 to 74 years | 808 | 639 | 419 | 65.6 | 108 | 16.9 | 112 | 17.5 | 370 | 57.9 | 158 | 24.7 | 111 | 17.4 | 51.8 | 45.8
-MALE | 75 years and over | 580 | 511 | 311 | 60.9 | 92 | 18 | 108 | 21.1 | 280 | 54.9 | 136 | 26.7 | 94 | 18.5 | 53.6 | 48.3
-FEMALE | Total 18 years and over | 9331 | 6744 | 4458 | 66.1 | 1080 | 16 | 1206 | 17.9 | 3920 | 58.1 | 1600 | 23.7 | 1224 | 18.1 | 47.8 | 42
-FEMALE | 18 to 24 years | 951 | 771 | 437 | 56.6 | 137 | 17.7 | 198 | 25.6 | 377 | 49 | 191 | 24.8 | 202 | 26.3 | 45.9 | 39.7
-FEMALE | 25 to 44 years | 3631 | 2251 | 1511 | 67.1 | 394 | 17.5 | 346 | 15.4 | 1312 | 58.3 | 582 | 25.9 | 357 | 15.9 | 41.6 | 36.1
-FEMALE | 45 to 64 years | 2961 | 2311 | 1588 | 68.7 | 327 | 14.1 | 396 | 17.1 | 1418 | 61.4 | 481 | 20.8 | 412 | 17.8 | 53.6 | 47.9
-FEMALE | 65 to 74 years | 1017 | 795 | 540 | 68 | 126 | 15.8 | 129 | 16.2 | 488 | 61.4 | 174 | 21.9 | 133 | 16.7 | 53.1 | 48
-FEMALE | 75 years and over | 770 | 615 | 382 | 62.1 | 97 | 15.7 | 136 | 22.2 | 324 | 52.7 | 172 | 27.9 | 119 | 19.4 | 49.6 | 42
-Margins of Error3
+BOTH SEXES | Total | 260363 | 236138 | 173854 | 73.6 | 28009 | 11.9 | 34275 | 14.5 | 154308 | 65.3 | 48480 | 20.5 | 33351 | 14.1 | 66.8 | 59.3
+BOTH SEXES | Less than 9th grade | 7949 | 3998 | 1687 | 42.2 | 1518 | 38 | 793 | 19.8 | 1233 | 30.8 | 2024 | 50.6 | 741 | 18.5 | 21.2 | 15.5
+BOTH SEXES | 9th to 12th grade, no diploma | 15103 | 12294 | 6053 | 49.2 | 3488 | 28.4 | 2753 | 22.4 | 4704 | 38.3 | 5037 | 41 | 2554 | 20.8 | 40.1 | 31.1
+BOTH SEXES | High school graduate | 74515 | 67643 | 42866 | 63.4 | 12668 | 18.7 | 12109 | 17.9 | 35540 | 52.5 | 20572 | 30.4 | 11531 | 17 | 57.5 | 47.7
+BOTH SEXES | Some college or associate's degree | 67779 | 64672 | 49593 | 76.7 | 6643 | 10.3 | 8437 | 13 | 43564 | 67.4 | 12839 | 19.9 | 8270 | 12.8 | 73.2 | 64.3
+BOTH SEXES | Bachelor's degree | 59865 | 55578 | 46070 | 82.9 | 2771 | 5 | 6737 | 12.1 | 42900 | 77.2 | 5883 | 10.6 | 6796 | 12.2 | 77 | 71.7
+BOTH SEXES | Advanced degree | 35152 | 31953 | 27585 | 86.3 | 921 | 2.9 | 3447 | 10.8 | 26367 | 82.5 | 2126 | 6.7 | 3460 | 10.8 | 78.5 | 75
+MALE | Total | 126726 | 114290 | 82553 | 72.2 | 14756 | 12.9 | 16981 | 14.9 | 72776 | 63.7 | 25019 | 21.9 | 16494 | 14.4 | 65.1 | 57.4
+MALE | Less than 9th grade | 4096 | 2031 | 865 | 42.6 | 778 | 38.3 | 388 | 19.1 | 629 | 31 | 1034 | 50.9 | 367 | 18.1 | 21.1 | 15.4
+MALE | 9th to 12th grade, no diploma | 8057 | 6485 | 3090 | 47.7 | 1955 | 30.2 | 1439 | 22.2 | 2390 | 36.9 | 2743 | 42.3 | 1352 | 20.8 | 38.4 | 29.7
+MALE | High school graduate | 39074 | 35483 | 21982 | 61.9 | 6957 | 19.6 | 6544 | 18.4 | 18019 | 50.8 | 11306 | 31.9 | 6159 | 17.4 | 56.3 | 46.1
+MALE | Some college or associate's degree | 31748 | 30236 | 22969 | 76 | 3369 | 11.1 | 3898 | 12.9 | 20142 | 66.6 | 6218 | 20.6 | 3875 | 12.8 | 72.3 | 63.4
+MALE | Bachelor's degree | 27797 | 25788 | 21338 | 82.7 | 1276 | 4.9 | 3173 | 12.3 | 19829 | 76.9 | 2743 | 10.6 | 3216 | 12.5 | 76.8 | 71.3
+MALE | Advanced degree | 15953 | 14268 | 12309 | 86.3 | 420 | 2.9 | 1538 | 10.8 | 11767 | 82.5 | 975 | 6.8 | 1526 | 10.7 | 77.2 | 73.8
+FEMALE | Total | 133637 | 121849 | 91301 | 74.9 | 13253 | 10.9 | 17294 | 14.2 | 81532 | 66.9 | 23461 | 19.3 | 16856 | 13.8 | 68.3 | 61
+FEMALE | Less than 9th grade | 3852 | 1967 | 822 | 41.8 | 741 | 37.6 | 404 | 20.6 | 604 | 30.7 | 990 | 50.3 | 373 | 19 | 21.3 | 15.7
+FEMALE | 9th to 12th grade, no diploma | 7046 | 5810 | 2963 | 51 | 1533 | 26.4 | 1314 | 22.6 | 2313 | 39.8 | 2294 | 39.5 | 1202 | 20.7 | 42.1 | 32.8
+FEMALE | High school graduate | 35442 | 32159 | 20884 | 64.9 | 5710 | 17.8 | 5565 | 17.3 | 17522 | 54.5 | 9266 | 28.8 | 5372 | 16.7 | 58.9 | 49.4
+FEMALE | Some college or associate's degree | 36031 | 34437 | 26624 | 77.3 | 3274 | 9.5 | 4539 | 13.2 | 23422 | 68 | 6620 | 19.2 | 4395 | 12.8 | 73.9 | 65
+FEMALE | Bachelor's degree | 32068 | 29791 | 24732 | 83 | 1495 | 5 | 3564 | 12 | 23071 | 77.4 | 3140 | 10.5 | 3580 | 12 | 77.1 | 71.9
+FEMALE | Advanced degree | 19199 | 17685 | 15276 | 86.4 | 501 | 2.8 | 1909 | 10.8 | 14600 | 82.6 | 1151 | 6.5 | 1934 | 10.9 | 79.6 | 76
 Characteristics | Total population | United States citizen | Total population
 Total citizen population | Reported registered | Reported not registered | No response to registration1 | Reported voted | Reported not voted | No response to voting2 | Reported registered | Reported voted
 Number | Percent | Number | Percent | Number | Percent | Number | Percent | Number | Percent | Number | Percent | Percent | Percent
-BOTH SEXES | Total 18 years and over | 189 | 324 | 315 | 2 | 215 | 1.6 | 247 | 1.8 | 322 | 2.2 | 240 | 1.8 | 245 | 1.8 | 1.8 | 1.8
-BOTH SEXES | 18 to 24 years | 99 | 117 | 101 | 5.2 | 56 | 3.8 | 81 | 4.7 | 98 | 5.5 | 75 | 4.8 | 82 | 4.8 | 4.6 | 4.6
-BOTH SEXES | 25 to 44 years | 111 | 191 | 162 | 2.7 | 114 | 2.4 | 93 | 2 | 167 | 3 | 130 | 2.7 | 94 | 2 | 2.2 | 2.3
-BOTH SEXES | 45 to 64 years | 89 | 141 | 159 | 2.8 | 94 | 2.1 | 115 | 2.6 | 161 | 3.2 | 118 | 2.6 | 114 | 2.5 | 2.8 | 2.8
-BOTH SEXES | 65 to 74 years | 118 | 120 | 112 | 4.8 | 52 | 3.5 | 63 | 4.2 | 105 | 4.8 | 63 | 4.1 | 63 | 4.2 | 4.8 | 4.6
-BOTH SEXES | 75 years and over | 114 | 108 | 94 | 5.5 | 51 | 4.4 | 61 | 5 | 90 | 5.5 | 62 | 5 | 55 | 4.7 | 5.5 | 5.5
-MALE | Total 18 years and over | 109 | 188 | 189 | 2.6 | 126 | 2 | 144 | 2.2 | 197 | 2.9 | 152 | 2.4 | 137 | 2.1 | 2.2 | 2.3
-MALE | 18 to 24 years | 58 | 75 | 65 | 7.5 | 41 | 5.5 | 55 | 6.6 | 62 | 8 | 56 | 6.9 | 54 | 6.6 | 6.2 | 6.1
-MALE | 25 to 44 years | 68 | 117 | 105 | 3.5 | 67 | 2.9 | 60 | 2.8 | 111 | 4.1 | 85 | 3.6 | 59 | 2.8 | 3 | 3.2
-MALE | 45 to 64 years | 57 | 85 | 92 | 3.4 | 54 | 2.6 | 65 | 3.1 | 93 | 3.9 | 67 | 3.1 | 61 | 2.9 | 3.5 | 3.6
-MALE | 65 to 74 years | 70 | 72 | 64 | 6.5 | 33 | 5 | 40 | 5.8 | 62 | 6.6 | 39 | 5.7 | 40 | 5.8 | 6 | 5.9
-MALE | 75 years and over | 64 | 63 | 56 | 7.2 | 33 | 6.1 | 37 | 7.1 | 56 | 7.9 | 39 | 6.9 | 35 | 6.7 | 7.4 | 7.8
-FEMALE | Total 18 years and over | 127 | 198 | 188 | 2.1 | 124 | 1.8 | 134 | 1.9 | 189 | 2.3 | 139 | 2 | 137 | 1.9 | 1.9 | 1.9
-FEMALE | 18 to 24 years | 68 | 76 | 68 | 6.7 | 42 | 5.1 | 52 | 6.5 | 69 | 7 | 48 | 6 | 53 | 6.7 | 6.1 | 6.3
-FEMALE | 25 to 44 years | 76 | 114 | 103 | 3.6 | 74 | 3 | 61 | 2.6 | 103 | 3.8 | 84 | 3.4 | 61 | 2.6 | 2.7 | 2.7
-FEMALE | 45 to 64 years | 55 | 93 | 99 | 3.3 | 60 | 2.6 | 74 | 3 | 97 | 3.6 | 73 | 3.2 | 78 | 3.1 | 3.2 | 3.1
-FEMALE | 65 to 74 years | 73 | 73 | 71 | 5.8 | 36 | 4.3 | 36 | 4.4 | 67 | 5.8 | 41 | 4.9 | 37 | 4.4 | 5.8 | 5.6
-FEMALE | 75 years and over | 74 | 68 | 57 | 6.6 | 30 | 4.6 | 38 | 5.5 | 55 | 6.8 | 41 | 6.1 | 36 | 5.2 | 6.2 | 6.2
+BOTH SEXES | Total | 224 | 748 | 1247 | 0.5 | 711 | 0.3 | 1044 | 0.4 | 1218 | 0.5 | 910 | 0.4 | 1060 | 0.4 | 0.5 | 0.5
+BOTH SEXES | Less than 9th grade | 418 | 252 | 156 | 3.1 | 174 | 3.3 | 112 | 2.6 | 135 | 2.8 | 192 | 3.3 | 112 | 2.7 | 1.9 | 1.6
+BOTH SEXES | 9th to 12th grade, no diploma | 549 | 480 | 323 | 1.8 | 215 | 1.5 | 239 | 1.7 | 278 | 1.7 | 264 | 1.7 | 242 | 1.7 | 1.6 | 1.5
+BOTH SEXES | High school graduate | 1047 | 1003 | 764 | 0.9 | 443 | 0.6 | 591 | 0.8 | 689 | 0.9 | 591 | 0.7 | 577 | 0.8 | 0.8 | 0.8
+BOTH SEXES | Some college or associate's degree | 934 | 899 | 802 | 0.6 | 304 | 0.4 | 351 | 0.5 | 768 | 0.7 | 429 | 0.6 | 347 | 0.5 | 0.7 | 0.7
+BOTH SEXES | Bachelor's degree | 890 | 876 | 783 | 0.7 | 186 | 0.3 | 372 | 0.6 | 754 | 0.7 | 277 | 0.5 | 379 | 0.6 | 0.8 | 0.8
+BOTH SEXES | Advanced degree | 765 | 742 | 703 | 0.8 | 109 | 0.3 | 251 | 0.7 | 688 | 0.9 | 169 | 0.5 | 255 | 0.8 | 1 | 1
+MALE | Total | 171 | 439 | 714 | 0.6 | 451 | 0.4 | 598 | 0.5 | 680 | 0.6 | 544 | 0.5 | 609 | 0.5 | 0.6 | 0.5
+MALE | Less than 9th grade | 246 | 157 | 104 | 3.9 | 103 | 4 | 78 | 3.6 | 93 | 3.7 | 115 | 4.2 | 78 | 3.6 | 2.3 | 2.1
+MALE | 9th to 12th grade, no diploma | 366 | 324 | 212 | 2.4 | 153 | 1.9 | 166 | 2.1 | 175 | 2.2 | 188 | 2.1 | 170 | 2.3 | 2 | 1.8
+MALE | High school graduate | 642 | 622 | 510 | 1.1 | 316 | 0.8 | 356 | 0.9 | 463 | 1.1 | 387 | 0.9 | 346 | 0.9 | 1.1 | 1
+MALE | Some college or associate's degree | 596 | 580 | 515 | 0.9 | 206 | 0.7 | 233 | 0.7 | 488 | 1 | 286 | 0.9 | 221 | 0.7 | 0.9 | 1
+MALE | Bachelor's degree | 568 | 568 | 522 | 0.9 | 119 | 0.5 | 222 | 0.8 | 503 | 0.9 | 178 | 0.7 | 224 | 0.8 | 1 | 1
+MALE | Advanced degree | 464 | 437 | 408 | 1.1 | 63 | 0.4 | 148 | 1 | 394 | 1.1 | 106 | 0.7 | 150 | 1 | 1.1 | 1.1
+FEMALE | Total | 161 | 437 | 684 | 0.5 | 419 | 0.3 | 552 | 0.4 | 723 | 0.6 | 565 | 0.5 | 543 | 0.4 | 0.5 | 0.5
+FEMALE | Less than 9th grade | 235 | 163 | 98 | 4 | 110 | 4.3 | 67 | 3 | 79 | 3.5 | 121 | 4 | 64 | 2.9 | 2.4 | 1.9
+FEMALE | 9th to 12th grade, no diploma | 314 | 274 | 199 | 2.3 | 137 | 2.1 | 130 | 1.9 | 187 | 2.5 | 176 | 2.6 | 126 | 1.9 | 2.1 | 2.2
+FEMALE | High school graduate | 648 | 620 | 436 | 0.9 | 261 | 0.7 | 324 | 0.9 | 390 | 1 | 357 | 0.9 | 313 | 0.9 | 0.9 | 0.9
+FEMALE | Some college or associate's degree | 623 | 605 | 546 | 0.7 | 185 | 0.5 | 214 | 0.6 | 519 | 0.9 | 271 | 0.7 | 215 | 0.6 | 0.8 | 0.9
+FEMALE | Bachelor's degree | 611 | 595 | 520 | 0.9 | 133 | 0.4 | 253 | 0.8 | 500 | 0.9 | 193 | 0.6 | 250 | 0.8 | 0.9 | 0.9
+FEMALE | Advanced degree | 465 | 457 | 438 | 0.9 | 74 | 0.4 | 158 | 0.9 | 431 | 1 | 120 | 0.7 | 162 | 0.9 | 1.1 | 1.2
 1 'No response to registration' includes those who were not asked if they were registered as well as those who responded 'Don't Know,' and 'Refused.'
 2 'No response to voting' includes those who were not asked if they voted as well as those who responded  'Don't Know,' and 'Refused.'
 3 This figure added to or subtracted from the estimate provides the 90-percent confidence interval.
 NOTES:
-Federal surveys now give respondents the option of reporting more than one race. Therefore, two basic ways of defining a race group are possible. A group such as Asian may be defined as those who reported Asian and no other race (the race-alone or single-race concept) or as those who reported Asian regardless of whether they also reported another race (the race-alone-or-in-combination concept).
 Estimates may not sum to totals due to rounding.
 Information on confidentiality protection, sampling error, nonsampling error, and definitions is available at <https://www.census.gov/programs-surveys/cps/technical-documentation/complete.24.html>
 Source: U.S. Census Bureau, Current Population Survey Public-Use Data, November 2024
 
-Michigan page: Loaded 13 congressional districts in Michigan. ACS 2020–2024. CPS 2024: 1,654 eligible respondents, 80.8% reported being registered. | statewide registered Coll+ 32.2% | 13 districts | groups add to 100%: true | errors: 0
-
-Idaho page: Loaded 2 congressional districts in Idaho. ACS 2020–2024. CPS 2024: 1,433 eligible respondents, 71.2% reported being registered. | statewide registered Coll+ 36.1% | 2 districts | groups add to 100%: true | errors: 0
+== vote04b_2024.xlsx
+Table with row headers in columns A and B and column headers in rows 4 through 5
+Table 4b. Reported Voting and Registration of the Total Voting-Age Population, by Sex, Race and Hispanic Origin, for States: November 2024
+Characteristics | Total population | Total citizen population | Registered | Voted
+Total registered | Percent registered
+(Total) | Margin of error (+/-)1 | Percent registered
+(Citizen) | Margin of error (+/-)1 | Total voted | Percent voted
+(Total) | Margin of error (+/-)1 | Percent voted
+(Citizen) | Margin of error (+/-)1
+UNITED STATES | Total | 260363 | 236138 | 173854 | 66.8 | 0.5 | 73.6 | 0.5 | 154308 | 59.3 | 0.5 | 65.3 | 0.5
+UNITED STATES | Male | 126726 | 114290 | 82553 | 65.1 | 0.6 | 72.2 | 0.6 | 72776 | 57.4 | 0.5 | 63.7 | 0.6
+UNITED STATES | Female | 133637 | 121849 | 91301 | 68.3 | 0.5 | 74.9 | 0.5 | 81532 | 61 | 0.5 | 66.9 | 0.6
+UNITED STATES | White alone | 198950 | 183117 | 137468 | 69.1 | 0.5 | 75.1 | 0.5 | 123220 | 61.9 | 0.5 | 67.3 | 0.5
+UNITED STATES | White non-Hispanic alone | 157374 | 154575 | 120035 | 76.3 | 0.6 | 77.7 | 0.6 | 108919 | 69.2 | 0.6 | 70.5 | 0.6
+UNITED STATES | Black alone | 33786 | 31221 | 21878 | 64.8 | 1.4 | 70.1 | 1.4 | 18612 | 55.1 | 1.4 | 59.6 | 1.5
+UNITED STATES | Asian alone | 17712 | 12775 | 8337 | 47.1 | 1.8 | 65.3 | 2 | 7288 | 41.1 | 1.8 | 57.1 | 2.2
+UNITED STATES | Hispanic (any race) | 47030 | 32765 | 20144 | 42.8 | 1.2 | 61.5 | 1.4 | 16573 | 35.2 | 1 | 50.6 | 1.3
+UNITED STATES | White alone or in combination | 204375 | 188086 | 141019 | 69 | 0.5 | 75 | 0.5 | 126218 | 61.8 | 0.5 | 67.1 | 0.5
+UNITED STATES | Black alone or in combination | 36391 | 33527 | 23514 | 64.6 | 1.3 | 70.1 | 1.4 | 19901 | 54.7 | 1.4 | 59.4 | 1.4
+UNITED STATES | Asian alone or in combination | 19319 | 14314 | 9483 | 49.1 | 1.7 | 66.2 | 1.9 | 8322 | 43.1 | 1.7 | 58.1 | 2
+CALIFORNIA | Total | 30100 | 25327 | 18471 | 61.4 | 1.5 | 72.9 | 1.5 | 16385 | 54.4 | 1.5 | 64.7 | 1.6
+CALIFORNIA | Male | 14752 | 12292 | 8837 | 59.9 | 1.8 | 71.9 | 1.7 | 7817 | 53 | 1.8 | 63.6 | 1.8
+CALIFORNIA | Female | 15349 | 13035 | 9634 | 62.8 | 1.7 | 73.9 | 1.7 | 8569 | 55.8 | 1.7 | 65.7 | 1.8
+CALIFORNIA | White alone | 21419 | 18057 | 13472 | 62.9 | 1.9 | 74.6 | 1.9 | 12014 | 56.1 | 1.9 | 66.5 | 1.9
+CALIFORNIA | White non-Hispanic alone | 11335 | 10792 | 8679 | 76.6 | 2.4 | 80.4 | 2.4 | 8017 | 70.7 | 2.6 | 74.3 | 2.6
+CALIFORNIA | Black alone | 1922 | 1822 | 1315 | 68.4 | 5 | 72.2 | 5 | 1156 | 60.1 | 5.1 | 63.5 | 5.2
+CALIFORNIA | Asian alone | 5110 | 3915 | 2586 | 50.6 | 3.5 | 66 | 3.7 | 2271 | 44.4 | 3.5 | 58 | 4
+CALIFORNIA | Hispanic (any race) | 11198 | 8272 | 5410 | 48.3 | 2.7 | 65.4 | 2.8 | 4545 | 40.6 | 2.6 | 54.9 | 2.8
+CALIFORNIA | White alone or in combination | 22271 | 18842 | 14085 | 63.2 | 1.9 | 74.8 | 1.8 | 12544 | 56.3 | 1.9 | 66.6 | 1.9
+CALIFORNIA | Black alone or in combination | 2157 | 2037 | 1483 | 68.8 | 4.9 | 72.8 | 4.9 | 1286 | 59.6 | 5.1 | 63.1 | 5.2
+CALIFORNIA | Asian alone or in combination | 5502 | 4288 | 2884 | 52.4 | 3.3 | 67.3 | 3.4 | 2539 | 46.1 | 3.3 | 59.2 | 3.6
+IDAHO | Total | 1517 | 1428 | 1017 | 67 | 2 | 71.2 | 2.1 | 932 | 61.4 | 2.1 | 65.2 | 2.2
+IDAHO | Male | 759 | 710 | 505 | 66.5 | 2.6 | 71.1 | 2.7 | 466 | 61.3 | 2.7 | 65.6 | 2.8
+IDAHO | Female | 758 | 718 | 512 | 67.6 | 2.5 | 71.3 | 2.5 | 466 | 61.5 | 2.6 | 64.9 | 2.6
+IDAHO | White alone | 1401 | 1331 | 952 | 68 | 2.1 | 71.5 | 2.2 | 873 | 62.3 | 2.3 | 65.6 | 2.3
+IDAHO | White non-Hispanic alone | 1209 | 1198 | 889 | 73.6 | 2.4 | 74.2 | 2.4 | 817 | 67.6 | 2.7 | 68.1 | 2.6
+IDAHO | Black alone | 11 | 8 | 3 | 27.5 | 23.5 | 39.3 | 27.1 | 2 | 20.2 | 19.7 | 28.8 | 24
+IDAHO | Asian alone | 30 | 20 | 13 | 43.3 | 20.2 | 65.4 | 18.8 | 13 | 43.3 | 20.2 | 65.4 | 18.8
+IDAHO | Hispanic (any race) | 221 | 156 | 80 | 36.1 | 8.5 | 50.9 | 9.3 | 73 | 33.1 | 7.9 | 46.7 | 9.4
+IDAHO | White alone or in combination | 1430 | 1358 | 971 | 67.9 | 2.1 | 71.5 | 2.1 | 890 | 62.3 | 2.2 | 65.6 | 2.2
+IDAHO | Black alone or in combination | 15 | 12 | 3 | 21 | 19.1 | 27.2 | 23.4 | 2 | 15.4 | 15.6 | 20 | 19.2
+IDAHO | Asian alone or in combination | 43 | 31 | 22 | 52.6 | 17.8 | 73.5 | 16.3 | 22 | 52.6 | 17.8 | 73.5 | 16.3
+MICHIGAN | Total | 7850 | 7534 | 6090 | 77.6 | 2.7 | 80.8 | 2.5 | 5444 | 69.4 | 2.9 | 72.3 | 2.9
+MICHIGAN | Male | 3861 | 3701 | 2965 | 76.8 | 3.3 | 80.1 | 3.2 | 2653 | 68.7 | 3.3 | 71.7 | 3.2
+MICHIGAN | Female | 3989 | 3833 | 3125 | 78.3 | 2.7 | 81.5 | 2.6 | 2791 | 70 | 3.2 | 72.8 | 3.2
+MICHIGAN | White alone | 6430 | 6233 | 5076 | 78.9 | 3.2 | 81.4 | 3 | 4624 | 71.9 | 3.6 | 74.2 | 3.5
+MICHIGAN | White non-Hispanic alone | 5944 | 5880 | 4865 | 81.8 | 3.1 | 82.7 | 3 | 4448 | 74.8 | 3.4 | 75.7 | 3.4
+MICHIGAN | Black alone | 1042 | 1013 | 774 | 74.3 | 7.3 | 76.4 | 7 | 637 | 61.1 | 7.3 | 62.8 | 7.3
+MICHIGAN | Asian alone | 227 | 143 | 117 | 51.6 | 17.5 | 82.1 | 17.6 | 99 | 43.6 | 15.3 | 69.3 | 16.7
+MICHIGAN | Hispanic (any race) | 543 | 382 | 228 | 42 | 9.9 | 59.7 | 11.2 | 193 | 35.5 | 8.5 | 50.4 | 10.5
+MICHIGAN | White alone or in combination | 6559 | 6355 | 5192 | 79.2 | 3.1 | 81.7 | 2.9 | 4702 | 71.7 | 3.5 | 74 | 3.4
+MICHIGAN | Black alone or in combination | 1111 | 1075 | 831 | 74.8 | 7 | 77.2 | 6.7 | 663 | 59.7 | 7.2 | 61.7 | 7.3
+MICHIGAN | Asian alone or in combination | 247 | 163 | 138 | 55.6 | 17.3 | 84.4 | 15.9 | 119 | 48.2 | 15.6 | 73.1 | 15.5
