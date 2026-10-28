@@ -1,0 +1,30 @@
+PES1: Did you vote?
+   1 = Yes
+   2 = No
+   -1 = Not in Universe
+   -3 = Refused
+   -2 = Don't Know
+PES2: Registered to vote?
+   1 = Yes
+   2 = No
+   -2 = Don't Know
+   -1 = Not in Universe
+   -3 = Refused
+   -9 = No Response
+
+== Tool method: 2024 national % of citizens 18+ registered
+lessHS  47.5%
+hs      63.4%
+sc      75.9%
+assoc   77.8%
+bach    82.9%
+grad    86.3%
+TOTAL   73.6%
+
+== Census tables page: /data/tables/time-series/demo/voting-and-registration/p20-590.html
+Table 5: 
+!! published table FAILED: Failed to parse URL from undefined
+
+Michigan page: Loaded 13 congressional districts in Michigan. ACS 2020–2024. CPS 2024: 1,654 eligible respondents, 80.8% reported being registered. | statewide registered Coll+ 32.2% | 13 districts | groups add to 100%: true | errors: 0
+
+Idaho page: Loaded 2 congressional districts in Idaho. ACS 2020–2024. CPS 2024: 1,433 eligible respondents, 71.2% reported being registered. | statewide registered Coll+ 36.1% | 2 districts | groups add to 100%: true | errors: 0
