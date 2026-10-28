@@ -142,7 +142,7 @@ input[type=checkbox]{accent-color:var(--gold);width:16px;height:16px}
       <div class="seg" role="group" aria-label="Population">
         <button type="button" data-pop="voters" aria-pressed="true">Voters</button>
         <button type="button" data-pop="eligible" aria-pressed="false">Eligible voters</button>
-        <button type="button" data-pop="adults" aria-pressed="false">All adults 25+</button>
+        <button type="button" data-pop="adults" aria-pressed="false">All adults 18+</button>
       </div>
       <span class="hint" id="popHint"></span>
     </div>
@@ -218,14 +218,16 @@ const POP={
     note:"Estimate. Each area's citizens 18+ by education (ACS) are multiplied by the state's turnout rate for that education level, measured by the Census Current Population Survey after the chosen election. Turnout rates are statewide, so local differences in who turns out within an education level aren't captured. CPS turnout is self-reported and runs a little high, but the education mix is what matters here."},
   eligible:{label:"Eligible voters",short:"citizens 18+",hint:"Citizens 18 and older (ACS). Includes people who don't vote.",
     note:"Citizens 18 and older, from ACS table B29002. Includes people who are eligible but don't vote, so college grads run lower than in a voter universe. The gender split within each education level comes from the state's 2024 CPS data for citizens 18+, since the ACS table has no gender breakdown."},
-  adults:{label:"All adults 25+",short:"adults 25+",hint:"Every adult 25 and older (ACS), citizens or not.",
-    note:"All adults 25 and older, from ACS table B15002, including noncitizens and nonvoters. The ACS has no separate trade-school or some-grad-school codes: trade certificates fall under some college, and some grad school counts as a bachelor's degree."}
+  adults:{label:"All adults 18+",short:"adults 18+",hint:"Every adult 18 and older (ACS), citizens or not.",
+    note:"All adults 18 and older, from ACS table B15001, including noncitizens and nonvoters. Adults 18 to 24 who are still in school count at their current level, so college grads run a little lower than the standard 25+ figure. The ACS has no separate trade-school code: trade certificates fall under some college."}
 };
 
 // --- ACS tables ---
-// B15002 (adults 25+, by sex): 001 total; 002 male, 003-018 male cats; 019 female, 020-035 female cats.
-const B15=Array.from({length:35},(_,i)=>"B15002_"+String(i+1).padStart(3,"0")+"E");
-const B15G={lessHS:[1,2,3,4,5,6,7,8],hs:[9],sc:[10,11],assoc:[12],bach:[13],grad:[14,15,16]};
+// B15001 (adults 18+, sex by age by education): 001 total; 002 male, 043 female. Each sex has 5 age bands
+// (18-24, 25-34, 35-44, 45-64, 65+), each a band total followed by 7 categories:
+// <9th, 9-12 no diploma, HS, some college, associate, bachelor's, grad/professional.
+const B15=Array.from({length:83},(_,i)=>"B15001_"+String(i+1).padStart(3,"0")+"E");
+const B15G={lessHS:[1,2],hs:[3],sc:[4],assoc:[5],bach:[6],grad:[7]};
 // B29002 (citizens 18+): 001 total, 002 <9th, 003 9-12 no diploma, 004 HS, 005 some college, 006 associate, 007 bachelor's, 008 grad/professional.
 const B29=Array.from({length:8},(_,i)=>"B29002_"+String(i+1).padStart(3,"0")+"E");
 const B29G={lessHS:[2,3],hs:[4],sc:[5],assoc:[6],bach:[7],grad:[8]};
@@ -237,8 +239,8 @@ const pos=x=>{x=Number(x);return x>0?x:0};
 
 function fromB15(vals){
   const v=i=>pos(vals[i-1]);
-  const sex=base=>{const o={};for(const g of G)o[g]=B15G[g].reduce((s,k)=>s+v(base+k),0);return o};
-  return {total:v(1),m:sex(2),f:sex(19)};
+  const sex=base=>{const o={};for(const g of G){o[g]=0;for(let b=0;b<5;b++)for(const k of B15G[g])o[g]+=v(base+1+b*8+k)}return o};
+  return {total:v(1),m:sex(2),f:sex(43)};
 }
 // edu: totals by group; rate: multiplier per group; maleShare: share male per group
 function split(edu,rate,maleShare){
