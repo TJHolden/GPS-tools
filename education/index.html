@@ -141,6 +141,7 @@ input[type=checkbox]{accent-color:var(--gold);width:16px;height:16px}
     <div class="popbar">
       <div class="seg" role="group" aria-label="Population">
         <button type="button" data-pop="voters" aria-pressed="true">Voters</button>
+        <button type="button" data-pop="registered" aria-pressed="false">Registered voters</button>
         <button type="button" data-pop="eligible" aria-pressed="false">Eligible voters</button>
         <button type="button" data-pop="adults" aria-pressed="false">All adults 18+</button>
       </div>
@@ -216,6 +217,8 @@ const G=["lessHS","hs","sc","assoc","bach","grad"];
 const POP={
   voters:{label:"Voters (est.)",short:"voters",hint:"Estimated people who voted: eligible voters in each area, adjusted by the state's actual turnout for each education level (CPS Voting Supplement).",
     note:"Estimate. Each area's citizens 18+ by education (ACS) are multiplied by the state's turnout rate for that education level, measured by the Census Current Population Survey after the chosen election. Turnout rates are statewide, so local differences in who turns out within an education level aren't captured. CPS turnout is self-reported and runs a little high, but the education mix is what matters here."},
+  registered:{label:"Registered voters (est.)",short:"registered",hint:"Estimated registered voters: eligible voters in each area, adjusted by the state's registration rate for each education level (CPS Voting Supplement).",
+    note:"Estimate. Each area's citizens 18+ by education (ACS) are multiplied by the state's registration rate for that education level, measured by the Census Current Population Survey after the chosen election. Following the Census Bureau's definition, anyone who voted counts as registered. Rates are statewide, and registration is self-reported, so this is not the same as a voter-file registration count."},
   eligible:{label:"Eligible voters",short:"citizens 18+",hint:"Citizens 18 and older (ACS). Includes people who don't vote.",
     note:"Citizens 18 and older, from ACS table B29002. Includes people who are eligible but don't vote, so college grads run lower than in a voter universe. The gender split within each education level comes from the state's 2024 CPS data for citizens 18+, since the ACS table has no gender breakdown."},
   adults:{label:"All adults 18+",short:"adults 18+",hint:"Every adult 18 and older (ACS), citizens or not.",
@@ -250,7 +253,7 @@ function split(edu,rate,maleShare){
 }
 function fromB29(vals,cps,mode){
   const edu={};for(const g of G)edu[g]=B29G[g].reduce((s,k)=>s+pos(vals[k-1]),0);
-  return mode==="voters"?split(edu,cps.turnout,cps.maleVoters):split(edu,null,cps.maleCit);
+  return mode==="voters"?split(edu,cps.turnout,cps.maleVoters):mode==="registered"?split(edu,cps.regRate,cps.maleReg):split(edu,null,cps.maleCit);
 }
 function add(a,b){const r={total:a.total+b.total,m:{...a.m},f:{...a.f}};for(const g of G){r.m[g]+=b.m[g];r.f[g]+=b.f[g]}return r}
 function rollup(t){
@@ -292,21 +295,24 @@ function shortName(n){return n.split(/;|,/)[0].replace(/\s*\((19|20)\d\d\)/,"").
 
 // CPS: state turnout and gender mix by education, citizens 18+
 async function getCPS(year,st){
-  const j=await getJSON(`${year}/cps/voting/nov`,{get:"PEEDUCA,PES1,PESEX,PRTAGE,PRCITSHP,PWSSWGT",for:"state:"+st});
+  const j=await getJSON(`${year}/cps/voting/nov`,{get:"PEEDUCA,PES1,PES2,PESEX,PRTAGE,PRCITSHP,PWSSWGT",for:"state:"+st});
   const [hdr,...data]=j;const ix=n=>hdr.indexOf(n);
-  const E=ix("PEEDUCA"),V=ix("PES1"),S=ix("PESEX"),A=ix("PRTAGE"),C=ix("PRCITSHP"),W=ix("PWSSWGT");
-  const cit=zero(),vot=zero(),citM=zero(),votM=zero();let n=0,nv=0,tc=0,tv=0;
+  const E=ix("PEEDUCA"),V=ix("PES1"),RG=ix("PES2"),S=ix("PESEX"),A=ix("PRTAGE"),C=ix("PRCITSHP"),W=ix("PWSSWGT");
+  const cit=zero(),vot=zero(),citM=zero(),votM=zero(),reg=zero(),regM=zero();let n=0,nv=0,tc=0,tv=0,tr=0;
   for(const r of data){
     const age=+r[A],c=+r[C],e=+r[E],w=+r[W];
     if(!(age>=18)||!(c>=1&&c<=4)||!(e>=31&&e<=46)||!(w>0))continue;
     const g=CPSG(e),male=+r[S]===1,voted=+r[V]===1;
     n++;cit[g]+=w;tc+=w;if(male)citM[g]+=w;
     if(voted){nv++;vot[g]+=w;tv+=w;if(male)votM[g]+=w}
+    // Census definition: registered = voted, or did not vote but reported being registered.
+    if(voted||+r[RG]===1){reg[g]+=w;tr+=w;if(male)regM[g]+=w}
   }
   if(n<100)throw new Error(`The ${year} CPS has too few respondents for this state (${n}) to estimate turnout.`);
-  const turnout={},maleCit={},maleVoters={};
-  for(const g of G){turnout[g]=cit[g]?vot[g]/cit[g]:0;maleCit[g]=cit[g]?citM[g]/cit[g]:.5;maleVoters[g]=vot[g]?votM[g]/vot[g]:maleCit[g]}
-  return {turnout,maleCit,maleVoters,n,nv,overall:tc?tv/tc:0};
+  const turnout={},maleCit={},maleVoters={},regRate={},maleReg={};
+  for(const g of G){turnout[g]=cit[g]?vot[g]/cit[g]:0;maleCit[g]=cit[g]?citM[g]/cit[g]:.5;maleVoters[g]=vot[g]?votM[g]/vot[g]:maleCit[g];
+    regRate[g]=cit[g]?reg[g]/cit[g]:0;maleReg[g]=reg[g]?regM[g]/reg[g]:maleCit[g]}
+  return {turnout,maleCit,maleVoters,regRate,maleReg,n,nv,overall:tc?tv/tc:0,overallReg:tc?tr/tc:0};
 }
 
 // Newest releases are detected at load: any CPS November file or ACS 5-year release newer than the
@@ -339,7 +345,7 @@ function initForm(){
 function syncPop(){
   document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pop===pop));
   $("popHint").textContent=POP[pop].hint; $("note").textContent=POP[pop].note;
-  $("elecLab").hidden=pop!=="voters";
+  $("elecLab").hidden=!(pop==="voters"||pop==="registered");
 }
 
 async function run(e){
@@ -351,7 +357,7 @@ async function run(e){
   try{
     let make, vars, cps=null;
     if(pop==="adults"){vars=B15;make=v=>fromB15(v)}
-    else{vars=B29;cps=await getCPS(pop==="voters"?elec:"2024",st); make=v=>fromB29(v,cps,pop)}
+    else{vars=B29;cps=await getCPS(pop==="voters"||pop==="registered"?elec:"2024",st); make=v=>fromB29(v,cps,pop)}
     // The Census API allows at most 50 variables per request, so long tables are fetched in pieces and joined by geography.
     const chunks=[];for(let i=0;i<vars.length;i+=45)chunks.push(vars.slice(i,i+45));
     const fetchMerged=async(path,params)=>{
@@ -375,6 +381,7 @@ async function run(e){
     selected.clear(); meta={stName,geo,year,elec,pop}; cpsInfo=cps;
     let msg=`Loaded ${units.length} ${units.length===1?GEO[geo].label:GEO[geo].plural} in ${stName}. ACS ${year-4}–${year}.`;
     if(cps&&pop==="voters")msg+=` CPS ${elec}: ${int(cps.n)} eligible respondents, ${pct(cps.overall)}% reported voting.`;
+    if(cps&&pop==="registered")msg+=` CPS ${elec}: ${int(cps.n)} eligible respondents, ${pct(cps.overallReg)}% reported being registered.`;
     setStatus(msg); render();
   }catch(err){
     setStatus((err instanceof TypeError?"Couldn't reach the Census API (the browser blocked or lost the request).":err.message)+" Test link: "+lastUrl,true);
@@ -391,6 +398,7 @@ function current(){
 function source(){
   const P=POP[meta.pop];
   return meta.pop==="voters"?`Est. ${meta.elec} voters · ACS ${meta.year-4}–${meta.year} + CPS ${meta.elec}`
+    :meta.pop==="registered"?`Est. ${meta.elec} registered voters · ACS ${meta.year-4}–${meta.year} + CPS ${meta.elec}`
     :`${P.label} · ACS ${meta.year-4}–${meta.year}`;
 }
 function renderSummary(){
@@ -399,7 +407,7 @@ function renderSummary(){
   const r=rollup(c.t);
   $("sumMeta").innerHTML=source()+(c.n>1?`<br>${c.names.slice(0,6).join(", ")}${c.n>6?`, +${c.n-6} more`:""}`:"");
   const bar=(lab,x,col,cls)=>`<div class="bar-row ${cls||""}" style="--c:var(${col})"><span class="lab">${lab}</span><span class="val">${pct(x)}%</span><div class="bar"><i style="width:${x*100}%"></i></div></div>`;
-  $("sumBody").innerHTML=`<div class="big"><b>${int(r.total)}</b><span>${meta.pop==="voters"?"estimated voters":POP[meta.pop].short}</span></div>`+
+  $("sumBody").innerHTML=`<div class="big"><b>${int(r.total)}</b><span>${meta.pop==="voters"?"estimated voters":meta.pop==="registered"?"estimated registered voters":POP[meta.pop].short}</span></div>`+
     stack(r,true)+
     `<h3>GPS education groups</h3>`+
     bar("High school or less",r.hsLess,"--e1")+bar("Less than high school",r.lessHS,"--e1","sub")+bar("High school graduate",r.hs,"--e1","sub")+
@@ -411,9 +419,9 @@ function renderSummary(){
       <div class="rh">&lt;Coll</div><div class="num tot">${pct(r.ltColl)}%</div><div class="num">${pct(r.mLt)}%</div><div class="num">${pct(r.fLt)}%</div>
       <div class="rh">Coll+</div><div class="num tot">${pct(r.coll)}%</div><div class="num">${pct(r.mGe)}%</div><div class="num">${pct(r.fGe)}%</div>
     </div>`+
-    (cpsInfo&&meta.pop==="voters"?`<h3>${meta.stName} turnout by education, ${meta.elec} (CPS)</h3>`+
+    (cpsInfo&&(meta.pop==="voters"||meta.pop==="registered")?`<h3>${meta.stName} ${meta.pop==="voters"?"turnout":"registration"} by education, ${meta.elec} (CPS)</h3>`+
       [["Less than HS","lessHS"],["High school grad","hs"],["Some college","sc"],["Associate","assoc"],["Bachelor's","bach"],["Graduate","grad"]]
-      .map(([l,g])=>bar(l,cpsInfo.turnout[g],"--gold","sub turn")).join(""):"");
+      .map(([l,g])=>bar(l,(meta.pop==="voters"?cpsInfo.turnout:cpsInfo.regRate)[g],"--gold","sub turn")).join(""):"");
 }
 function stack(r,legend){
   const seg=[[r.hsLess,"--e1","HS or less"],[r.scA,"--e2","Some coll/Assoc"],[r.bach,"--e3","4-year"],[r.grad,"--e4","Grad"]];
@@ -439,7 +447,7 @@ function renderTable(){
 function render(){renderSummary();renderTable();$("copySum").disabled=!stateRow;$("clearSel").disabled=!selected.size}
 
 document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{if(pop===b.dataset.pop)return;pop=b.dataset.pop;syncPop();run()}));
-$("elec").addEventListener("change",()=>{if(pop==="voters")run()});
+$("elec").addEventListener("change",()=>{if(pop==="voters"||pop==="registered")run()});
 $("thead").addEventListener("click",e=>{const th=e.target.closest("th[data-k]");if(!th)return;
   const k=th.dataset.k; sortDir=sortKey===k?-sortDir:(k==="name"?1:-1); sortKey=k; renderTable()});
 $("tbody").addEventListener("change",e=>{const id=e.target.dataset.id;if(!id)return;
