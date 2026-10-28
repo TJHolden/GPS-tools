@@ -1,0 +1,77 @@
+== B15001 labels used for each group
+lessHS  4 | Estimate!!Total:!!Male:!!18 to 24 years:!!Less than 9th grade
+lessHS  5 | Estimate!!Total:!!Male:!!18 to 24 years:!!9th to 12th grade, no diploma
+lessHS  12 | Estimate!!Total:!!Male:!!25 to 34 years:!!Less than 9th grade
+lessHS  13 | Estimate!!Total:!!Male:!!25 to 34 years:!!9th to 12th grade, no diploma
+lessHS  20 | Estimate!!Total:!!Male:!!35 to 44 years:!!Less than 9th grade
+lessHS  21 | Estimate!!Total:!!Male:!!35 to 44 years:!!9th to 12th grade, no diploma
+lessHS  28 | Estimate!!Total:!!Male:!!45 to 64 years:!!Less than 9th grade
+lessHS  29 | Estimate!!Total:!!Male:!!45 to 64 years:!!9th to 12th grade, no diploma
+lessHS  36 | Estimate!!Total:!!Male:!!65 years and over:!!Less than 9th grade
+lessHS  37 | Estimate!!Total:!!Male:!!65 years and over:!!9th to 12th grade, no diploma
+lessHS  45 | Estimate!!Total:!!Female:!!18 to 24 years:!!Less than 9th grade
+lessHS  46 | Estimate!!Total:!!Female:!!18 to 24 years:!!9th to 12th grade, no diploma
+lessHS  53 | Estimate!!Total:!!Female:!!25 to 34 years:!!Less than 9th grade
+lessHS  54 | Estimate!!Total:!!Female:!!25 to 34 years:!!9th to 12th grade, no diploma
+lessHS  61 | Estimate!!Total:!!Female:!!35 to 44 years:!!Less than 9th grade
+lessHS  62 | Estimate!!Total:!!Female:!!35 to 44 years:!!9th to 12th grade, no diploma
+lessHS  69 | Estimate!!Total:!!Female:!!45 to 64 years:!!Less than 9th grade
+lessHS  70 | Estimate!!Total:!!Female:!!45 to 64 years:!!9th to 12th grade, no diploma
+lessHS  77 | Estimate!!Total:!!Female:!!65 years and over:!!Less than 9th grade
+lessHS  78 | Estimate!!Total:!!Female:!!65 years and over:!!9th to 12th grade, no diploma
+hs      6 | Estimate!!Total:!!Male:!!18 to 24 years:!!High school graduate (includes equivalency)
+hs      14 | Estimate!!Total:!!Male:!!25 to 34 years:!!High school graduate (includes equivalency)
+hs      22 | Estimate!!Total:!!Male:!!35 to 44 years:!!High school graduate (includes equivalency)
+hs      30 | Estimate!!Total:!!Male:!!45 to 64 years:!!High school graduate (includes equivalency)
+hs      38 | Estimate!!Total:!!Male:!!65 years and over:!!High school graduate (includes equivalency)
+hs      47 | Estimate!!Total:!!Female:!!18 to 24 years:!!High school graduate (includes equivalency)
+hs      55 | Estimate!!Total:!!Female:!!25 to 34 years:!!High school graduate (includes equivalency)
+hs      63 | Estimate!!Total:!!Female:!!35 to 44 years:!!High school graduate (includes equivalency)
+hs      71 | Estimate!!Total:!!Female:!!45 to 64 years:!!High school graduate (includes equivalency)
+hs      79 | Estimate!!Total:!!Female:!!65 years and over:!!High school graduate (includes equivalency)
+sc      7 | Estimate!!Total:!!Male:!!18 to 24 years:!!Some college, no degree
+sc      15 | Estimate!!Total:!!Male:!!25 to 34 years:!!Some college, no degree
+sc      23 | Estimate!!Total:!!Male:!!35 to 44 years:!!Some college, no degree
+sc      31 | Estimate!!Total:!!Male:!!45 to 64 years:!!Some college, no degree
+sc      39 | Estimate!!Total:!!Male:!!65 years and over:!!Some college, no degree
+sc      48 | Estimate!!Total:!!Female:!!18 to 24 years:!!Some college, no degree
+sc      56 | Estimate!!Total:!!Female:!!25 to 34 years:!!Some college, no degree
+sc      64 | Estimate!!Total:!!Female:!!35 to 44 years:!!Some college, no degree
+sc      72 | Estimate!!Total:!!Female:!!45 to 64 years:!!Some college, no degree
+sc      80 | Estimate!!Total:!!Female:!!65 years and over:!!Some college, no degree
+assoc   8 | Estimate!!Total:!!Male:!!18 to 24 years:!!Associate's degree
+assoc   16 | Estimate!!Total:!!Male:!!25 to 34 years:!!Associate's degree
+assoc   24 | Estimate!!Total:!!Male:!!35 to 44 years:!!Associate's degree
+assoc   32 | Estimate!!Total:!!Male:!!45 to 64 years:!!Associate's degree
+assoc   40 | Estimate!!Total:!!Male:!!65 years and over:!!Associate's degree
+assoc   49 | Estimate!!Total:!!Female:!!18 to 24 years:!!Associate's degree
+assoc   57 | Estimate!!Total:!!Female:!!25 to 34 years:!!Associate's degree
+assoc   65 | Estimate!!Total:!!Female:!!35 to 44 years:!!Associate's degree
+assoc   73 | Estimate!!Total:!!Female:!!45 to 64 years:!!Associate's degree
+assoc   81 | Estimate!!Total:!!Female:!!65 years and over:!!Associate's degree
+bach    9 | Estimate!!Total:!!Male:!!18 to 24 years:!!Bachelor's degree
+bach    17 | Estimate!!Total:!!Male:!!25 to 34 years:!!Bachelor's degree
+bach    25 | Estimate!!Total:!!Male:!!35 to 44 years:!!Bachelor's degree
+bach    33 | Estimate!!Total:!!Male:!!45 to 64 years:!!Bachelor's degree
+bach    41 | Estimate!!Total:!!Male:!!65 years and over:!!Bachelor's degree
+bach    50 | Estimate!!Total:!!Female:!!18 to 24 years:!!Bachelor's degree
+bach    58 | Estimate!!Total:!!Female:!!25 to 34 years:!!Bachelor's degree
+bach    66 | Estimate!!Total:!!Female:!!35 to 44 years:!!Bachelor's degree
+bach    74 | Estimate!!Total:!!Female:!!45 to 64 years:!!Bachelor's degree
+bach    82 | Estimate!!Total:!!Female:!!65 years and over:!!Bachelor's degree
+grad    10 | Estimate!!Total:!!Male:!!18 to 24 years:!!Graduate or professional degree
+grad    18 | Estimate!!Total:!!Male:!!25 to 34 years:!!Graduate or professional degree
+grad    26 | Estimate!!Total:!!Male:!!35 to 44 years:!!Graduate or professional degree
+grad    34 | Estimate!!Total:!!Male:!!45 to 64 years:!!Graduate or professional degree
+grad    42 | Estimate!!Total:!!Male:!!65 years and over:!!Graduate or professional degree
+grad    51 | Estimate!!Total:!!Female:!!18 to 24 years:!!Graduate or professional degree
+grad    59 | Estimate!!Total:!!Female:!!25 to 34 years:!!Graduate or professional degree
+grad    67 | Estimate!!Total:!!Female:!!35 to 44 years:!!Graduate or professional degree
+grad    75 | Estimate!!Total:!!Female:!!45 to 64 years:!!Graduate or professional degree
+grad    83 | Estimate!!Total:!!Female:!!65 years and over:!!Graduate or professional degree
+002 | Estimate!!Total:!!Male:    043 | Estimate!!Total:!!Female:    001 | Estimate!!Total:
+
+== All adults 18+ Coll+: tool page vs published S1501 (18-24 BA+ plus 25+ BA+)
+Michigan tool 30.1% published 30.1% | adults 18+: 7937277
+Idaho tool 28.6% published 28.6% | adults 18+: 1468079
+California tool 34.3% published 34.3% | adults 18+: 30654581
